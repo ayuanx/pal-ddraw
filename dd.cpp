@@ -125,7 +125,7 @@ namespace dd
 	{ 
 		PROLOGUE;
 		EnumStruct e;
-		e.callback = lpEnumSurfacesCallback;
+		e.callback = (void*)lpEnumSurfacesCallback;
 		e.context = lpContext;
 		e.dd_parent = This->dd_parent;
 		e.xVtbl = dd_to_dds_vtbl( This );
@@ -312,7 +312,7 @@ namespace dd
 		Initialize,             // 0x48
 		RestoreDisplayMode,     // 0x4C
 		SetCooperativeLevel,    // 0x50
-		SetDisplayMode1,        // 0x54
+		(void*)SetDisplayMode1,        // 0x54
 		WaitForVerticalBlank,   // 0x58
 		0, // 0x5C
 		0, // 0x60
@@ -345,7 +345,7 @@ namespace dd
 		Initialize,             // 0x48
 		RestoreDisplayMode,     // 0x4C
 		SetCooperativeLevel,    // 0x50
-		SetDisplayMode2,        // 0x54
+		(void*)SetDisplayMode2,        // 0x54
 		WaitForVerticalBlank,   // 0x58
 		GetAvailableVidMem,     // 0x5C
 		0, // 0x60
@@ -378,7 +378,7 @@ namespace dd
 		Initialize,             // 0x48
 		RestoreDisplayMode,     // 0x4C
 		SetCooperativeLevel,    // 0x50
-		SetDisplayMode2,        // 0x54
+		(void*)SetDisplayMode2,        // 0x54
 		WaitForVerticalBlank,   // 0x58
 		GetAvailableVidMem,     // 0x5C
 		GetSurfaceFromDC,       // 0x60
@@ -411,7 +411,7 @@ namespace dd
 		Initialize,             // 0x48
 		RestoreDisplayMode,     // 0x4C
 		SetCooperativeLevel,    // 0x50
-		SetDisplayMode2,        // 0x54
+		(void*)SetDisplayMode2,        // 0x54
 		WaitForVerticalBlank,   // 0x58
 		GetAvailableVidMem,     // 0x5C
 		GetSurfaceFromDC,       // 0x60

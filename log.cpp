@@ -10,7 +10,7 @@ HANDLE file = INVALID_HANDLE_VALUE;
 CRITICAL_SECTION log_lock;
 
 // todo: this function needs to be replaced
-void __cdecl Log( char* fmt, ...)
+void __cdecl Log(const char* fmt, ...)
 {
 	static char buf[1024];
 	static size_t pos = 0; 
@@ -151,7 +151,7 @@ void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_OVERLAY )			Log( ", DDSCAPS_OVERLAY" ); 
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_PALETTE )			Log( ", DDSCAPS_PALETTE" ); 
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE )	Log( ", DDSCAPS_PRIMARYSURFACE" ); 
-		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_RESERVED3 )		Log( ", DDSCAPS_RESERVED3" ); 
+		//if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_RESERVED3 )		Log( ", DDSCAPS_RESERVED3" ); 
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_SYSTEMMEMORY )	Log( ", DDSCAPS_SYSTEMMEMORY" ); 
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_TEXTURE )			Log( ", DDSCAPS_TEXTURE" ); 
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_3DDEVICE )		Log( ", DDSCAPS_3DDEVICE" ); 

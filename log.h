@@ -14,8 +14,8 @@
 	they exist in case someone wants them for debugging
 */
 
-extern "C" void * _ReturnAddress( void );
-#pragma intrinsic( _ReturnAddress )
+//extern "C" void * _ReturnAddress( void );
+//#pragma intrinsic( _ReturnAddress )
 
 void __cdecl Log( char* fmt, ... );
 void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc );
@@ -52,5 +52,4 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName );
 #define TRACE(x)	Log( "TRACE: %s %s\r\n", __FUNCTION__, x );
 #define WARN(x)     Log( "WARNING: %s %s\r\n", __FUNCTION__, x ); 
 */
-
 

@@ -171,7 +171,7 @@ namespace dds
 	{ 
 		PROLOGUE;
 		EnumStruct e;
-		e.callback = lpEnumSurfacesCallback;
+		e.callback = (void*)lpEnumSurfacesCallback;
 		e.context = lpContext;
 		e.dd_parent = This->dd_parent;
 		e.xVtbl = This->xVtbl;
@@ -184,7 +184,7 @@ namespace dds
 	{
 		PROLOGUE;
 		EnumStruct e;
-		e.callback = lpfnCallback;
+		e.callback = (void*)lpfnCallback;
 		e.context = lpContext;
 		e.dd_parent = This->dd_parent;
 		e.xVtbl = This->xVtbl;
@@ -406,7 +406,7 @@ namespace dds
     HRESULT __stdcall UpdateOverlayZOrder( WRAP* This, DWORD dwFlags, LPDIRECTDRAWSURFACE lpDDSReference )
 	{ 
 		PROLOGUE;
-		if( dwFlags & ( DDOVERZ_INSERTINBACKOF | DDOVERZ_INSERTINFRONTOF ) ) lpDDSReference = GetInnerInterface( lpDDSReference );
+		//if( dwFlags & ( DDOVERZ_INSERTINBACKOF | DDOVERZ_INSERTINFRONTOF ) ) lpDDSReference = GetInnerInterface( lpDDSReference );
 		HRESULT hResult = This->dds1->lpVtbl->UpdateOverlayZOrder( This->dds1, dwFlags, lpDDSReference ); 
 		EPILOGUE( hResult );
 	}

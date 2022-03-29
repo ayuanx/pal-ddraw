@@ -53,9 +53,9 @@ GetDDSurfaceLocal_t				pGetDDSurfaceLocal;
 GetSurfaceFromDC_t				pGetSurfaceFromDC;
 RegisterSpecialCase_t			pRegisterSpecialCase;
 
-#pragma warning( disable: 4996 )  // strcat is unsafe
-#pragma intrinsic( strcat )
-BOOL __stdcall DllEntryPoint( HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved )
+//#pragma warning( disable: 4996 )  // strcat is unsafe
+//#pragma intrinsic( strcat )
+BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 {
 	PROLOGUE;
 	UNREFERENCED_PARAMETER( lpvReserved );
@@ -82,24 +82,24 @@ BOOL __stdcall DllEntryPoint( HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved
 					pDirectDrawCreateEx				= (DirectDrawCreateEx_t)			GetProcAddress( hRealDDraw, "DirectDrawCreateEx");
 					pDirectDrawCreateClipper		= (DirectDrawCreateClipper_t)		GetProcAddress( hRealDDraw, "DirectDrawCreateClipper");
 					pDirectDrawEnumerateA			= (DirectDrawEnumerateA_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateA");
-					pDirectDrawEnumerateExA			= (DirectDrawEnumerateExA_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExA");
-					pDirectDrawEnumerateExW			= (DirectDrawEnumerateExW_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExW");
-					pDirectDrawEnumerateW			= (DirectDrawEnumerateW_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateW");
-					pD3DParseUnknownCommand			= (D3DParseUnknownCommand_t)		GetProcAddress( hRealDDraw, "D3DParseUnknownCommand");
+					//pDirectDrawEnumerateExA			= (DirectDrawEnumerateExA_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExA");
+					//pDirectDrawEnumerateExW			= (DirectDrawEnumerateExW_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExW");
+					//pDirectDrawEnumerateW			= (DirectDrawEnumerateW_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateW");
+					//pD3DParseUnknownCommand			= (D3DParseUnknownCommand_t)		GetProcAddress( hRealDDraw, "D3DParseUnknownCommand");
 					pDllGetClassObject				= (DllGetClassObject_t)				GetProcAddress( hRealDDraw, "DllGetClassObject");
 					pDllCanUnloadNow				= (DllCanUnloadNow_t)				GetProcAddress( hRealDDraw, "DllCanUnloadNow");
-					pAcquireDDThreadLock			= (AcquireDDThreadLock_t)			GetProcAddress( hRealDDraw, "AcquireDDThreadLock");
-					pReleaseDDThreadLock			= (ReleaseDDThreadLock_t)			GetProcAddress( hRealDDraw, "ReleaseDDThreadLock");
-					pGetOLEThunkData				= (GetOLEThunkData_t)				GetProcAddress( hRealDDraw, "GetOLEThunkData");
-					pSetAppCompatData				= (SetAppCompatData_t)				GetProcAddress( hRealDDraw, "SetAppCompatData");
-					pCompleteCreateSysmemSurface	= (CompleteCreateSysmemSurface_t)	GetProcAddress( hRealDDraw, "CompleteCreateSysmemSurface");
-					pDDGetAttachedSurfaceLcl		= (DDGetAttachedSurfaceLcl_t)		GetProcAddress( hRealDDraw, "DDGetAttachedSurfaceLcl");
-					pDDInternalLock					= (DDInternalLock_t)				GetProcAddress( hRealDDraw, "DDInternalLock");
-					pDDInternalUnlock				= (DDInternalUnlock_t)				GetProcAddress( hRealDDraw, "DDInternalUnlock");
-					pDSoundHelp						= (DSoundHelp_t)					GetProcAddress( hRealDDraw, "DSoundHelp" );
-					pGetDDSurfaceLocal				= (GetDDSurfaceLocal_t)				GetProcAddress( hRealDDraw, "GetDDSurfaceLocal" );
-					pGetSurfaceFromDC				= (GetSurfaceFromDC_t)				GetProcAddress( hRealDDraw, "GetSurfaceFromDC" );
-					pRegisterSpecialCase			= (RegisterSpecialCase_t)			GetProcAddress( hRealDDraw, "RegisterSpecialCase" );
+					//pAcquireDDThreadLock			= (AcquireDDThreadLock_t)			GetProcAddress( hRealDDraw, "AcquireDDThreadLock");
+					//pReleaseDDThreadLock			= (ReleaseDDThreadLock_t)			GetProcAddress( hRealDDraw, "ReleaseDDThreadLock");
+					//pGetOLEThunkData				= (GetOLEThunkData_t)				GetProcAddress( hRealDDraw, "GetOLEThunkData");
+					//pSetAppCompatData				= (SetAppCompatData_t)				GetProcAddress( hRealDDraw, "SetAppCompatData");
+					//pCompleteCreateSysmemSurface	= (CompleteCreateSysmemSurface_t)	GetProcAddress( hRealDDraw, "CompleteCreateSysmemSurface");
+					//pDDGetAttachedSurfaceLcl		= (DDGetAttachedSurfaceLcl_t)		GetProcAddress( hRealDDraw, "DDGetAttachedSurfaceLcl");
+					//pDDInternalLock					= (DDInternalLock_t)				GetProcAddress( hRealDDraw, "DDInternalLock");
+					//pDDInternalUnlock				= (DDInternalUnlock_t)				GetProcAddress( hRealDDraw, "DDInternalUnlock");
+					//pDSoundHelp						= (DSoundHelp_t)					GetProcAddress( hRealDDraw, "DSoundHelp" );
+					//pGetDDSurfaceLocal				= (GetDDSurfaceLocal_t)				GetProcAddress( hRealDDraw, "GetDDSurfaceLocal" );
+					//pGetSurfaceFromDC				= (GetSurfaceFromDC_t)				GetProcAddress( hRealDDraw, "GetSurfaceFromDC" );
+					//pRegisterSpecialCase			= (RegisterSpecialCase_t)			GetProcAddress( hRealDDraw, "RegisterSpecialCase" );
 				}
 			}
 			break;

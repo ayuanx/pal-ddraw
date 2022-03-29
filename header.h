@@ -6,7 +6,7 @@
 #include <windows.h>
 #include <guiddef.h>
 #include <ddraw.h>
-#include "wine/d3d.h"
+#include <d3d.h>
 
 #include "wrap.h"
 #include "log.h"
@@ -17,6 +17,6 @@ namespace classfactory { struct XVTBL; extern const XVTBL xVtbl; };
 namespace clipper { struct XVTBL; extern const XVTBL xVtbl; };
 namespace palette { struct XVTBL; extern const XVTBL xVtbl; };
 namespace color { struct XVTBL; extern const XVTBL xVtbl; };
-namespace gamma { struct XVTBL; extern const XVTBL xVtbl; };
+namespace dgamma { struct XVTBL; extern const XVTBL xVtbl; };
 namespace unknwn { struct XVTBL; extern const XVTBL xVtbl; };
 
