@@ -1,4 +1,4 @@
- #include "header.h"
+#include "header.h"
 
 namespace palette
 {
@@ -41,14 +41,14 @@ namespace palette
 		HRESULT hResult = This->pal->lpVtbl->GetCaps( This->pal, lpdwCaps );
 		EPILOGUE( hResult );
 	}
-	
+
 	HRESULT __stdcall GetEntries( WRAP* This, DWORD dwFlags, DWORD dwBase, DWORD dwNumEntries, LPPALETTEENTRY lpEntries )
 	{
 		PROLOGUE;
 		HRESULT hResult = This->pal->lpVtbl->GetEntries( This->pal, dwFlags, dwBase, dwNumEntries, lpEntries );
 		EPILOGUE( hResult );
 	}
-	
+
 	HRESULT __stdcall Initialize( WRAP* This, LPDIRECTDRAW lpDD, DWORD dwFlags, LPPALETTEENTRY lpDDColorTable )
 	{
 		PROLOGUE;
@@ -60,6 +60,23 @@ namespace palette
 	{
 		PROLOGUE;
 		HRESULT hResult = This->pal->lpVtbl->SetEntries( This->pal, dwFlags, dwStartingEntry, dwCount, lpEntries );
+		if (SUCCEEDED(hResult) && dx::enabled && (This->pal == dx::palette)) {
+			// Wait until palette is fully initialized.
+			if (dx::enabled > 256 && dx::Update()) {
+				HDC src, dest;
+				dx::fakeFront->lpVtbl->GetDC(dx::fakeFront, &src);
+				if (dx::realFront->lpVtbl->GetDC(dx::realFront, &dest) == DDERR_SURFACELOST) {
+					dx::realFront->lpVtbl->Restore(dx::realFront);
+					dx::realFront->lpVtbl->GetDC(dx::realFront, &dest);
+				}
+				BitBlt(dest, 0, 0, dx::width, dx::height, src, 0, 0, SRCCOPY);
+				dx::realFront->lpVtbl->ReleaseDC(dx::realFront, dest);
+				dx::fakeFront->lpVtbl->ReleaseDC(dx::fakeFront, src);
+				TRACE("SetEntries BitBlt");
+			} else {
+				dx::enabled += dwCount;
+			}
+		}
 		EPILOGUE( hResult );
 	}
 

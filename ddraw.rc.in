@@ -11,7 +11,7 @@ PRODUCTVERSION 0,0,0,0
             VALUE "InternalName", "pal-ddraw"
             VALUE "LegalCopyright", "AyuanX"
             VALUE "OriginalFileName", "pal-ddraw.dll"
-            VALUE "FileDescription", "DirectDraw Wrapper"
+            VALUE "FileDescription", "DirectDraw Palette Emulator"
             VALUE "Comments", "https://github.com/ayuanx/pal-ddraw.git"
         }
     }

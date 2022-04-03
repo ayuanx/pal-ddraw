@@ -31,7 +31,7 @@ struct WRAP
 		IDirectDrawClipper*      clip;
 		IDirectDrawPalette*      pal;
 		IDirectDrawColorControl* color;
-		IDirectDrawGammaControl* dgamma;
+		IDirectDrawGammaControl* gama;
 	};
 	DD_LIFETIME* dd_parent;
 	WRAP* next; // for use in unordered hash map

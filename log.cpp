@@ -10,7 +10,7 @@ HANDLE file = INVALID_HANDLE_VALUE;
 CRITICAL_SECTION log_lock;
 
 // todo: this function needs to be replaced
-void __cdecl Log(const char* fmt, ...)
+void __cdecl Log( const char* fmt, ... )
 {
 	static char buf[1024];
 	static size_t pos = 0; 
@@ -105,8 +105,8 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName )
 
 void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 {
-	if( lpDDSurfaceDesc->dwSize >= sizeof( DDSURFACEDESC2 ) ) Log( "DDSD2:\r\n");
-	else Log( "DDSD:\r\n");
+	if( lpDDSurfaceDesc->dwSize >= sizeof( DDSURFACEDESC2 ) ) Log( "DDSD2:\n");
+	else Log( "DDSD:\n");
 
 	DWORD dwKnownFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PITCH | DDSD_BACKBUFFERCOUNT | DDSD_ZBUFFERBITDEPTH |
 		DDSD_ALPHABITDEPTH | DDSD_LPSURFACE | DDSD_PIXELFORMAT | DDSD_CKDESTOVERLAY | DDSD_CKDESTBLT | DDSD_CKSRCOVERLAY | DDSD_CKSRCBLT | 
@@ -136,7 +136,7 @@ void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 		if( lpDDSurfaceDesc->dwFlags & DDSD_DEPTH )				Log( ", DDSD_DEPTH" ); 
 		if( lpDDSurfaceDesc->dwFlags & ~( dwKnownFlags ) )		Log( ", UNKNOWN!! 0x%08X", (lpDDSurfaceDesc->dwFlags & ~( dwKnownFlags )) );       
 	}
-	Log( " }\r\n" );
+	Log( " }\n" );
 
 	if( ( lpDDSurfaceDesc->dwFlags & DDSD_CAPS ) || ( lpDDSurfaceDesc->dwFlags == DDSD_ALL ) )
 	{
@@ -172,7 +172,7 @@ void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_STANDARDVGAMODE )	Log( ", DDSCAPS_STANDARDVGAMODE" ); 
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_OPTIMIZED )		Log( ", DDSCAPS_OPTIMIZED" ); 
 		if( lpDDSurfaceDesc->ddsCaps.dwCaps & 0x03000000 )				Log( ", UNKNOWN!! 0x%08X", ( lpDDSurfaceDesc->ddsCaps.dwCaps & 0x03000000 ) );
-		Log( " }\r\n" );
+		Log( " }\n" );
 	}
 
 	Log( "    " );
@@ -184,11 +184,11 @@ void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 
 	if( ( lpDDSurfaceDesc->dwFlags & DDSD_BACKBUFFERCOUNT ) || ( lpDDSurfaceDesc->dwFlags == DDSD_ALL ) )
 		Log( "backbuffers: %d ", lpDDSurfaceDesc->dwBackBufferCount );
-	Log( "\r\n" );
+	Log( "\n" );
 
 	if( ( lpDDSurfaceDesc->dwFlags & DDSD_PIXELFORMAT ) || ( lpDDSurfaceDesc->dwFlags == DDSD_ALL ) )
 	{
-		Log( "    DDPF:\r\n" );
+		Log( "    DDPF:\n" );
 		Log( "        Flags{ 0x%08X", lpDDSurfaceDesc->ddpfPixelFormat.dwFlags ); 
 		if( lpDDSurfaceDesc->ddpfPixelFormat.dwFlags & DDPF_ALPHAPIXELS )		Log( ", DDPF_ALPHAPIXELS" ); 
 		if( lpDDSurfaceDesc->ddpfPixelFormat.dwFlags & DDPF_ALPHA )				Log( ", DDPF_ALPHA" ); 
@@ -210,63 +210,63 @@ void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 		if( lpDDSurfaceDesc->ddpfPixelFormat.dwFlags & DDPF_BUMPLUMINANCE )		Log( ", DDPF_BUMPLUMINANCE" );
 		if( lpDDSurfaceDesc->ddpfPixelFormat.dwFlags & DDPF_BUMPDUDV )			Log( ", DDPF_BUMPDUDV" ); 
 		if( lpDDSurfaceDesc->ddpfPixelFormat.dwFlags & 0xFFF10000 )				Log( ", UNKNOWN!! 0x%08X", ( lpDDSurfaceDesc->ddpfPixelFormat.dwFlags & 0xFFF10000 ) );
-		Log( " }\r\n" );
+		Log( " }\n" );
 	}
 }
  
 
 void LogGUID(const GUID& riid)
 {
-	if      ( riid == IID_IUnknown                   ) Log( "IID_IUnknown\r\n"                   );
-	else if ( riid == IID_IClassFactory              ) Log( "IID_IClassFactory\r\n"              );
-	else if ( riid == IID_IDirectDraw                ) Log( "IID_IDirectDraw\r\n"                );
-	else if	( riid == IID_IDirectDraw2               ) Log( "IID_IDirectDraw2\r\n"               );
-	else if	( riid == IID_IDirectDraw4               ) Log( "IID_IDirectDraw4\r\n"               );
-	else if	( riid == IID_IDirectDraw7               ) Log( "IID_IDirectDraw7\r\n"               );
-	else if ( riid == IID_IDirectDrawSurface         ) Log( "IID_IDirectDrawSurface\r\n"         );
-	else if ( riid == IID_IDirectDrawSurface2        ) Log( "IID_IDirectDrawSurface2\r\n"        ); 
-	else if ( riid == IID_IDirectDrawSurface3        ) Log( "IID_IDirectDrawSurface3\r\n"        );
-	else if ( riid == IID_IDirectDrawSurface4        ) Log( "IID_IDirectDrawSurface4\r\n"        );
-	else if ( riid == IID_IDirectDrawSurface7        ) Log( "IID_IDirectDrawSurface7\r\n"        );
-	else if ( riid == IID_IDirectDrawClipper         ) Log( "IID_IDirectDrawClipper\r\n"         );
-	else if ( riid == IID_IDirectDrawPalette         ) Log( "IID_IDirectDrawPalette\r\n"         );
-	else if ( riid == IID_IDirectDrawColorControl    ) Log( "IID_IDirectDrawColorControl\r\n"    );
-	else if ( riid == IID_IDirectDrawGammaControl    ) Log( "IID_IDirectDrawGammaControl\r\n"    );
+	if      ( riid == IID_IUnknown                   ) Log( "IID_IUnknown\n"                   );
+	else if ( riid == IID_IClassFactory              ) Log( "IID_IClassFactory\n"              );
+	else if ( riid == IID_IDirectDraw                ) Log( "IID_IDirectDraw\n"                );
+	else if	( riid == IID_IDirectDraw2               ) Log( "IID_IDirectDraw2\n"               );
+	else if	( riid == IID_IDirectDraw4               ) Log( "IID_IDirectDraw4\n"               );
+	else if	( riid == IID_IDirectDraw7               ) Log( "IID_IDirectDraw7\n"               );
+	else if ( riid == IID_IDirectDrawSurface         ) Log( "IID_IDirectDrawSurface\n"         );
+	else if ( riid == IID_IDirectDrawSurface2        ) Log( "IID_IDirectDrawSurface2\n"        ); 
+	else if ( riid == IID_IDirectDrawSurface3        ) Log( "IID_IDirectDrawSurface3\n"        );
+	else if ( riid == IID_IDirectDrawSurface4        ) Log( "IID_IDirectDrawSurface4\n"        );
+	else if ( riid == IID_IDirectDrawSurface7        ) Log( "IID_IDirectDrawSurface7\n"        );
+	else if ( riid == IID_IDirectDrawClipper         ) Log( "IID_IDirectDrawClipper\n"         );
+	else if ( riid == IID_IDirectDrawPalette         ) Log( "IID_IDirectDrawPalette\n"         );
+	else if ( riid == IID_IDirectDrawColorControl    ) Log( "IID_IDirectDrawColorControl\n"    );
+	else if ( riid == IID_IDirectDrawGammaControl    ) Log( "IID_IDirectDrawGammaControl\n"    );
 	
 	// unsupported //
-	else if ( riid == _IID_IDDVideoPortContainer      ) Log( "IID_IDDVideoPortContainer\r\n"      );
-	else if ( riid == _IID_IDirectDrawVideoPort       ) Log( "IID_IDirectDrawVideoPort\r\n"       );
-	else if ( riid == _IID_IDirectDrawVideoPortNotify ) Log( "IID_IDirectDrawVideoPortNotify\r\n" );
-	else if ( riid == IID_IDirect3D                  ) Log( "IID_IDirect3D\r\n" );
-	else if ( riid == IID_IDirect3D2                 ) Log( "IID_IDirect3D2\r\n" );
-	else if ( riid == IID_IDirect3D3                 ) Log( "IID_IDirect3D3\r\n" );
-	else if ( riid == IID_IDirect3D7                 ) Log( "IID_IDirect3D7\r\n" );
-	else if ( riid == IID_IDirect3DTexture           ) Log( "IID_IDirect3DTexture\r\n" );
-	else if ( riid == IID_IDirect3DTexture2          ) Log( "IID_IDirect3DTexture2\r\n" );
-	else if ( riid == IID_IDirect3DRampDevice        ) Log( "IID_IDirect3DRampDevice\r\n" );
-	else if ( riid == IID_IDirect3DRGBDevice         ) Log( "IID_IDirect3DRGBDevice\r\n" );
-	else if ( riid == IID_IDirect3DHALDevice         ) Log( "IID_IDirect3DHALDevice\r\n" );
-	else if ( riid == IID_IDirect3DMMXDevice         ) Log( "IID_IDirect3DMMXDevice\r\n" );
-	else if ( riid == IID_IDirect3DRefDevice         ) Log( "IID_IDirect3DRefDevice\r\n" );
-	else if ( riid == IID_IDirect3DNullDevice        ) Log( "IID_IDirect3DNullDevice\r\n" );
-	else if ( riid == IID_IDirect3DTnLHalDevice      ) Log( "IID_IDirect3DTnLHalDevice\r\n" );
-	else if ( riid == IID_IDirect3DDevice            ) Log( "IID_IDirect3DDevice\r\n" );
-	else if ( riid == IID_IDirect3DDevice2           ) Log( "IID_IDirect3DDevice2\r\n" );
-	else if ( riid == IID_IDirect3DDevice3           ) Log( "IID_IDirect3DDevice3\r\n" );
-	else if ( riid == IID_IDirect3DDevice7           ) Log( "IID_IDirect3DDevice7\r\n" );
-	else if ( riid == IID_IDirect3DLight             ) Log( "IID_IDirect3DLight\r\n" );
-	else if ( riid == IID_IDirect3DMaterial          ) Log( "IID_IDirect3DMaterial\r\n" );
-	else if ( riid == IID_IDirect3DMaterial2         ) Log( "IID_IDirect3DMaterial2\r\n" );
-	else if ( riid == IID_IDirect3DMaterial3         ) Log( "IID_IDirect3DMaterial3\r\n" );
-	else if ( riid == IID_IDirect3DExecuteBuffer     ) Log( "IID_IDirect3DExecuteBuffer\r\n" );
-	else if ( riid == IID_IDirect3DViewport          ) Log( "IID_IDirect3DViewport\r\n" );
-	else if ( riid == IID_IDirect3DViewport2         ) Log( "IID_IDirect3DViewport2\r\n" );
-	else if ( riid == IID_IDirect3DViewport3         ) Log( "IID_IDirect3DViewport3\r\n" );
-	else if ( riid == IID_IDirect3DVertexBuffer      ) Log( "IID_IDirect3DVertexBuffer\r\n" );
-	else if ( riid == IID_IDirect3DVertexBuffer7     ) Log( "IID_IDirect3DVertexBuffer7\r\n" );
+	else if ( riid == _IID_IDDVideoPortContainer      ) Log( "IID_IDDVideoPortContainer\n"      );
+	else if ( riid == _IID_IDirectDrawVideoPort       ) Log( "IID_IDirectDrawVideoPort\n"       );
+	else if ( riid == _IID_IDirectDrawVideoPortNotify ) Log( "IID_IDirectDrawVideoPortNotify\n" );
+	else if ( riid == IID_IDirect3D                  ) Log( "IID_IDirect3D\n" );
+	else if ( riid == IID_IDirect3D2                 ) Log( "IID_IDirect3D2\n" );
+	else if ( riid == IID_IDirect3D3                 ) Log( "IID_IDirect3D3\n" );
+	else if ( riid == IID_IDirect3D7                 ) Log( "IID_IDirect3D7\n" );
+	else if ( riid == IID_IDirect3DTexture           ) Log( "IID_IDirect3DTexture\n" );
+	else if ( riid == IID_IDirect3DTexture2          ) Log( "IID_IDirect3DTexture2\n" );
+	else if ( riid == IID_IDirect3DRampDevice        ) Log( "IID_IDirect3DRampDevice\n" );
+	else if ( riid == IID_IDirect3DRGBDevice         ) Log( "IID_IDirect3DRGBDevice\n" );
+	else if ( riid == IID_IDirect3DHALDevice         ) Log( "IID_IDirect3DHALDevice\n" );
+	else if ( riid == IID_IDirect3DMMXDevice         ) Log( "IID_IDirect3DMMXDevice\n" );
+	else if ( riid == IID_IDirect3DRefDevice         ) Log( "IID_IDirect3DRefDevice\n" );
+	else if ( riid == IID_IDirect3DNullDevice        ) Log( "IID_IDirect3DNullDevice\n" );
+	else if ( riid == IID_IDirect3DTnLHalDevice      ) Log( "IID_IDirect3DTnLHalDevice\n" );
+	else if ( riid == IID_IDirect3DDevice            ) Log( "IID_IDirect3DDevice\n" );
+	else if ( riid == IID_IDirect3DDevice2           ) Log( "IID_IDirect3DDevice2\n" );
+	else if ( riid == IID_IDirect3DDevice3           ) Log( "IID_IDirect3DDevice3\n" );
+	else if ( riid == IID_IDirect3DDevice7           ) Log( "IID_IDirect3DDevice7\n" );
+	else if ( riid == IID_IDirect3DLight             ) Log( "IID_IDirect3DLight\n" );
+	else if ( riid == IID_IDirect3DMaterial          ) Log( "IID_IDirect3DMaterial\n" );
+	else if ( riid == IID_IDirect3DMaterial2         ) Log( "IID_IDirect3DMaterial2\n" );
+	else if ( riid == IID_IDirect3DMaterial3         ) Log( "IID_IDirect3DMaterial3\n" );
+	else if ( riid == IID_IDirect3DExecuteBuffer     ) Log( "IID_IDirect3DExecuteBuffer\n" );
+	else if ( riid == IID_IDirect3DViewport          ) Log( "IID_IDirect3DViewport\n" );
+	else if ( riid == IID_IDirect3DViewport2         ) Log( "IID_IDirect3DViewport2\n" );
+	else if ( riid == IID_IDirect3DViewport3         ) Log( "IID_IDirect3DViewport3\n" );
+	else if ( riid == IID_IDirect3DVertexBuffer      ) Log( "IID_IDirect3DVertexBuffer\n" );
+	else if ( riid == IID_IDirect3DVertexBuffer7     ) Log( "IID_IDirect3DVertexBuffer7\n" );
 	else 
 	{
-		Log( ">>>> Unknown GUID: 0x%08X,0x%04X,0x%04X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X <<<<\r\n",
+		Log( ">>>> Unknown GUID: 0x%08X,0x%04X,0x%04X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X <<<<\n",
 			riid.Data1, riid.Data2, riid.Data3, riid.Data4[0], riid.Data4[1], riid.Data4[2], riid.Data4[3], riid.Data4[4],
 			riid.Data4[5], riid.Data4[6], riid.Data4[7]
 		);

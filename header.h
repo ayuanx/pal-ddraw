@@ -4,7 +4,7 @@
 #define CINTERFACE 
 
 #include <windows.h>
-#include <guiddef.h>
+#include <wingdi.h>
 #include <ddraw.h>
 #include <d3d.h>
 
@@ -17,6 +17,8 @@ namespace classfactory { struct XVTBL; extern const XVTBL xVtbl; };
 namespace clipper { struct XVTBL; extern const XVTBL xVtbl; };
 namespace palette { struct XVTBL; extern const XVTBL xVtbl; };
 namespace color { struct XVTBL; extern const XVTBL xVtbl; };
-namespace dgamma { struct XVTBL; extern const XVTBL xVtbl; };
+namespace gama { struct XVTBL; extern const XVTBL xVtbl; };
 namespace unknwn { struct XVTBL; extern const XVTBL xVtbl; };
+
+namespace dx { extern DWORD enabled; extern DWORD time, width, height; extern LPDIRECTDRAWSURFACE realFront, realBack, fakeFront, fakeBack; extern LPDIRECTDRAWPALETTE palette; bool Update(); };
 

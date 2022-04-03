@@ -1,6 +1,6 @@
 #include "header.h"
 
-namespace dgamma
+namespace gama
 {
 	struct XVTBL
 	{
@@ -14,7 +14,7 @@ namespace dgamma
 	HRESULT __stdcall QueryInterface( WRAP* This, const IID& riid, void** ppvObject ) 
 	{ 
 		PROLOGUE;
-		HRESULT hResult = This->dgamma->lpVtbl->QueryInterface( This->dgamma, riid, ppvObject );
+		HRESULT hResult = This->gama->lpVtbl->QueryInterface( This->gama, riid, ppvObject );
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, iid_to_vtbl( riid ), ppvObject );
 		EPILOGUE( hResult );
 	}
@@ -22,7 +22,7 @@ namespace dgamma
 	ULONG __stdcall AddRef( WRAP* This ) 
 	{ 
 		PROLOGUE;
-		ULONG dwCount = This->dgamma->lpVtbl->AddRef( This->dgamma );
+		ULONG dwCount = This->gama->lpVtbl->AddRef( This->gama );
 		EPILOGUE( dwCount );
 	}
 
@@ -36,14 +36,14 @@ namespace dgamma
 	HRESULT __stdcall GetGammaRamp( WRAP* This, DWORD dwFlags, LPDDGAMMARAMP lpRampData )
 	{ 
 		PROLOGUE;
-		HRESULT hResult = This->dgamma->lpVtbl->GetGammaRamp( This->dgamma, dwFlags, lpRampData );
+		HRESULT hResult = This->gama->lpVtbl->GetGammaRamp( This->gama, dwFlags, lpRampData );
 		EPILOGUE( hResult );
 	}
 	
 	HRESULT __stdcall SetGammaRamp( WRAP* This, DWORD dwFlags, LPDDGAMMARAMP lpRampData )
 	{ 
 		PROLOGUE;
-		HRESULT hResult = This->dgamma->lpVtbl->SetGammaRamp( This->dgamma, dwFlags, lpRampData );
+		HRESULT hResult = This->gama->lpVtbl->SetGammaRamp( This->gama, dwFlags, lpRampData );
 		EPILOGUE( hResult );
 	}
 

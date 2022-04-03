@@ -72,7 +72,7 @@ namespace dd
 		HRESULT hResult = This->dd1->lpVtbl->Compact( This->dd1 );
 		EPILOGUE( hResult );  
 	}
-	
+
 	HRESULT __stdcall CreateClipper( WRAP* This, DWORD dwFlags, LPDIRECTDRAWCLIPPER *lplpDDClipper, IUnknown *pUnkOuter )
 	{ 
 		PROLOGUE;
@@ -94,11 +94,45 @@ namespace dd
 		}
 		EPILOGUE( hResult );
 	}
-    
+
 	HRESULT __stdcall CreateSurface( WRAP* This, LPDDSURFACEDESC lpDDSurfaceDesc, LPDIRECTDRAWSURFACE *lplpDDSurface, IUnknown *pUnkOuter ) 
 	{ 
 		PROLOGUE;
-		HRESULT hResult =  This->dd1->lpVtbl->CreateSurface( This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter );
+		HRESULT hResult;
+		if (dx::enabled) {
+			if (lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) {
+				lpDDSurfaceDesc->dwFlags = DDSD_BACKBUFFERCOUNT | DDSD_CAPS;
+				lpDDSurfaceDesc->dwBackBufferCount = 1;
+				lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
+				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::realFront, pUnkOuter);
+				if (SUCCEEDED(hResult)) {
+					DDSCAPS ddsCaps = {0};
+					ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
+					dx::realFront->lpVtbl->GetAttachedSurface(dx::realFront, &ddsCaps, &dx::realBack);
+					INFO("realFront: %08X, realBack: %08X\n", dx::realFront, dx::realBack);
+					lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS | DDSD_PIXELFORMAT;
+					lpDDSurfaceDesc->dwHeight = dx::height;
+					lpDDSurfaceDesc->dwWidth = dx::width;
+					lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
+					lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+					lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
+					lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;
+					hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fakeFront, pUnkOuter);
+					if (SUCCEEDED(hResult)) hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fakeBack, pUnkOuter);
+					*lplpDDSurface = dx::fakeFront;
+					INFO("fakeFront: %08X, fakeBack: %08X\n", dx::fakeFront, dx::fakeBack);
+				}
+			} else {
+				lpDDSurfaceDesc->dwFlags |= DDSD_PIXELFORMAT;
+				lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+				lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
+				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;
+				hResult = This->dd1->lpVtbl->CreateSurface( This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter );
+				INFO("CreateSurface %08X\n", *lplpDDSurface);
+			}
+		} else {
+			hResult = This->dd1->lpVtbl->CreateSurface( This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter );
+		}
 		if( SUCCEEDED( hResult ) )
 		{
 			Wrap( This->dd_parent, dd_to_dds_vtbl( This ), (void**)lplpDDSurface );
@@ -114,14 +148,14 @@ namespace dd
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall EnumDisplayModes( WRAP* This, DWORD dwFlags, LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext, LPDDENUMMODESCALLBACK lpEnumModesCallback ) 
+	HRESULT __stdcall EnumDisplayModes( WRAP* This, DWORD dwFlags, LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext, LPDDENUMMODESCALLBACK lpEnumModesCallback ) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->EnumDisplayModes( This->dd1, dwFlags, lpDDSurfaceDesc, lpContext, lpEnumModesCallback ); 
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall EnumSurfaces( WRAP* This, DWORD dwFlags, LPDDSURFACEDESC lpDDSD, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpEnumSurfacesCallback ) 
+	HRESULT __stdcall EnumSurfaces( WRAP* This, DWORD dwFlags, LPDDSURFACEDESC lpDDSD, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpEnumSurfacesCallback ) 
 	{ 
 		PROLOGUE;
 		EnumStruct e;
@@ -134,35 +168,35 @@ namespace dd
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall FlipToGDISurface( WRAP* This ) 
+	HRESULT __stdcall FlipToGDISurface( WRAP* This ) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->FlipToGDISurface( This->dd1 );
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall GetCaps( WRAP* This, LPDDCAPS lpDDDriverCaps, LPDDCAPS lpDDHELCaps ) 
+	HRESULT __stdcall GetCaps( WRAP* This, LPDDCAPS lpDDDriverCaps, LPDDCAPS lpDDHELCaps ) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetCaps( This->dd1, lpDDDriverCaps, lpDDHELCaps );
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall GetDisplayMode( WRAP* This, LPDDSURFACEDESC lpDDSurfaceDesc ) 
+	HRESULT __stdcall GetDisplayMode( WRAP* This, LPDDSURFACEDESC lpDDSurfaceDesc ) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetDisplayMode( This->dd1, lpDDSurfaceDesc );
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall GetFourCCCodes( WRAP* This, LPDWORD lpNumCodes, LPDWORD lpCodes ) 
+	HRESULT __stdcall GetFourCCCodes( WRAP* This, LPDWORD lpNumCodes, LPDWORD lpCodes ) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetFourCCCodes( This->dd1, lpNumCodes, lpCodes );
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall GetGDISurface( WRAP* This, LPDIRECTDRAWSURFACE *lplpGDIDDSurface )
+	HRESULT __stdcall GetGDISurface( WRAP* This, LPDIRECTDRAWSURFACE *lplpGDIDDSurface )
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetGDISurface( This->dd1, lplpGDIDDSurface );
@@ -170,27 +204,27 @@ namespace dd
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall GetMonitorFrequency( WRAP* This, LPDWORD lpdwFrequency ) 
+	HRESULT __stdcall GetMonitorFrequency( WRAP* This, LPDWORD lpdwFrequency ) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetMonitorFrequency( This->dd1, lpdwFrequency );
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall GetScanLine( WRAP* This, LPDWORD lpdwScanLine ) 
+	HRESULT __stdcall GetScanLine( WRAP* This, LPDWORD lpdwScanLine ) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetScanLine( This->dd1, lpdwScanLine );
 		EPILOGUE( hResult );
 	}
-    
+
 	HRESULT __stdcall GetVerticalBlankStatus( WRAP* This, BOOL *lpbIsInVB ) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetVerticalBlankStatus( This->dd1, lpbIsInVB );
 		EPILOGUE( hResult );
 	}
-    
+
 	HRESULT __stdcall Initialize( WRAP* This, GUID *lpGUID ) 
 	{ 		
 		PROLOGUE;
@@ -198,7 +232,7 @@ namespace dd
 		EPILOGUE( hResult );
 	}
 
-    HRESULT __stdcall RestoreDisplayMode( WRAP* This )
+	HRESULT __stdcall RestoreDisplayMode( WRAP* This )
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->RestoreDisplayMode( This->dd1 );
@@ -213,21 +247,41 @@ namespace dd
 	}
 
 	// The signature of SetDisplayMode is different between v1 and v2
-    HRESULT __stdcall SetDisplayMode1( WRAP* This, DWORD dwWidth, DWORD dwHeight, DWORD dwBPP ) 
+	HRESULT __stdcall SetDisplayMode1( WRAP* This, DWORD dwWidth, DWORD dwHeight, DWORD dwBPP ) 
 	{ 
 		PROLOGUE;
+		if (dwBPP == 8) {
+			HDC dc = GetDC(NULL);
+			dwBPP = GetDeviceCaps(dc, BITSPIXEL) * GetDeviceCaps(dc, PLANES);
+			if (dwBPP != 8) {
+				dx::enabled = 1;
+				dx::width = dwWidth;
+				dx::height = dwHeight;
+				INFO("enabled: %d x %d x %d\n", dwWidth, dwHeight, dwBPP);
+			}
+		}
 		HRESULT hResult = This->dd1->lpVtbl->SetDisplayMode( This->dd1, dwWidth, dwHeight, dwBPP );
 		EPILOGUE( hResult );
 	}
+
 	HRESULT __stdcall SetDisplayMode2( WRAP* This, DWORD dwWidth, DWORD dwHeight, DWORD dwBPP, DWORD dwRefreshRate, DWORD dwFlags ) 
 	{ 
 		PROLOGUE;
+		if (dwBPP == 8) {
+			HDC dc = GetDC(NULL);
+			dwBPP = GetDeviceCaps(dc, BITSPIXEL) * GetDeviceCaps(dc, PLANES);
+			if (dwBPP != 8) {
+				dx::enabled = 1;
+				dx::width = dwWidth;
+				dx::height = dwHeight;
+				INFO("enabled: %d x %d x %d\n", dwWidth, dwHeight, dwBPP);
+			}
+		}
 		HRESULT hResult = This->dd2->lpVtbl->SetDisplayMode( This->dd2, dwWidth, dwHeight, dwBPP, dwRefreshRate, dwFlags );
 		EPILOGUE( hResult );
 	}
-	////
 
-    HRESULT __stdcall WaitForVerticalBlank( WRAP* This, DWORD dwFlags, HANDLE hEvent) 
+	HRESULT __stdcall WaitForVerticalBlank( WRAP* This, DWORD dwFlags, HANDLE hEvent) 
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->WaitForVerticalBlank( This->dd1, dwFlags, hEvent );

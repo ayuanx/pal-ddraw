@@ -27,7 +27,7 @@ const void* iid_to_vtbl( const GUID& riid )
 	else if ( riid == IID_IDirectDrawClipper      ) xVtbl = &clipper::xVtbl;
 	else if ( riid == IID_IDirectDrawPalette      ) xVtbl = &palette::xVtbl;
 	else if ( riid == IID_IDirectDrawColorControl ) xVtbl = &color::xVtbl;
-	else if ( riid == IID_IDirectDrawGammaControl ) xVtbl = &dgamma::xVtbl;
+	else if ( riid == IID_IDirectDrawGammaControl ) xVtbl = &gama::xVtbl;
 	else xVtbl = NULL;
 	return xVtbl;
 }

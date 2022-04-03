@@ -17,7 +17,7 @@
 //extern "C" void * _ReturnAddress( void );
 //#pragma intrinsic( _ReturnAddress )
 
-void __cdecl Log( char* fmt, ... );
+void __cdecl Log( const char* fmt, ... );
 void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc );
 void LogGUID( const GUID& riid );
 void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName );
@@ -28,15 +28,18 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName );
 #define PROLOGUE
 #define TRACE(x)
 #define WARN(x)
+#define INFO(...)
 
 /*
 // log light ( warnings, failed iface calls, some iface ids )
 #undef EPILOGUE
 #undef LOG_GUID
 #undef WARN
-#define EPILOGUE(x) if(FAILED(x)){Log( "%08X %08X %s\r\n", x, _ReturnAddress(), __FUNCTION__ );} return(x);
-#define LOG_GUID(x) LogGUID( x );
-#define WARN(x)     Log( "WARNING: %s\r\n", x ); 
+#undef INFO
+#define EPILOGUE(x) if(FAILED(x)){Log( "%08X %08X %s\n", x, __builtin_return_address(0), __FUNCTION__ );} return(x)
+#define LOG_GUID(x) LogGUID( x )
+#define WARN(x)     Log( "WARNING: %s\n", x ) 
+#define INFO(...)   Log(__VA_ARGS__)
 */
 
 /*
@@ -46,10 +49,12 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName );
 #undef PROLOGUE
 #undef TRACE
 #undef WARN
-#define EPILOGUE(x) Log( "%08X %s\r\n", x, __FUNCTION__ ); return(x);	
-#define LOG_GUID(x) LogGUID( x );
-#define PROLOGUE    Log( "> %08X %s\r\n", _ReturnAddress(), __FUNCTION__ );
-#define TRACE(x)	Log( "TRACE: %s %s\r\n", __FUNCTION__, x );
-#define WARN(x)     Log( "WARNING: %s %s\r\n", __FUNCTION__, x ); 
+#undef INFO
+#define EPILOGUE(x) Log( "%08X %s\n", x, __FUNCTION__ ); return(x)
+#define LOG_GUID(x) LogGUID( x )
+#define PROLOGUE    Log( "> %08X %s\n", __builtin_return_address(0), __FUNCTION__ )
+#define TRACE(x)    Log( "TRACE: %s %s\n", __FUNCTION__, x )
+#define WARN(x)     Log( "WARNING: %s %s\n", __FUNCTION__, x )
+#define INFO(...)   Log(__VA_ARGS__)
 */
 
