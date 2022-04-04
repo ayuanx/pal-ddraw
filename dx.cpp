@@ -18,9 +18,9 @@ namespace dx
 
 	bool Flush(LPDIRECTDRAWSURFACE fk, DWORD to) {
 		DWORD now = 0;
-		if (to == 0) { // 60 FPS Max 16ms
+		if (to == 0) { // Capped at 30 FPS (30ms)
 			now = timeGetTime(); 
-			if (now - time < 16) return false;
+			if (now - time < 30) return false;
 			time = now;
 		}
 		while (fk->lpVtbl->GetBltStatus(fk, DDGBS_ISBLTDONE) != DD_OK) Sleep(0);

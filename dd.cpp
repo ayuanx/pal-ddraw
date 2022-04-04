@@ -113,7 +113,7 @@ namespace dd
 					lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS | DDSD_PIXELFORMAT;
 					lpDDSurfaceDesc->dwHeight = dx::height;
 					lpDDSurfaceDesc->dwWidth = dx::width;
-					lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
+					lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
 					lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 					lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
 					lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;
@@ -125,7 +125,8 @@ namespace dd
 					INFO("fakeFront: %08X, fakeBack: %08X\n", dx::fake[0], dx::fake[1]);
 				}
 			} else {
-				lpDDSurfaceDesc->dwFlags |= DDSD_PIXELFORMAT;
+				lpDDSurfaceDesc->dwFlags |= DDSD_CAPS | DDSD_PIXELFORMAT;
+				lpDDSurfaceDesc->ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
 				lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 				lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
 				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;
