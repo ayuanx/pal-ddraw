@@ -12,7 +12,7 @@ Many old games and programs were specifically designed to run only in DirectDraw
 
 Unfotunately both Windows and DirectDraw have dropped the support to legacy 8-bit color mode that requires a palette.
 
-These games and programs simply fail to run properly when Windows destop is set to 16/24/32 bit color mode.
+These games and programs simply fail to run properly when Windows desktop is set to 16/24/32 bit color mode.
 
 In many cases, changing the compatibility settting to 8-bit (256) color mode does not help at all because of DirectDraw.
 
