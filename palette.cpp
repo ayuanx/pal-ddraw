@@ -62,10 +62,10 @@ namespace palette
 		HRESULT hResult = This->pal->lpVtbl->SetEntries( This->pal, dwFlags, dwStartingEntry, dwCount, lpEntries );
 		INFO("SetEntries offset %d cnt %d\n", dwStartingEntry, dwCount);
 		if (SUCCEEDED(hResult) && (This->pal == dx::palette)) {
-			// Wait until palette is fully initialized.
-			if (dx::enabled > 256) {
+			if (dx::enabled > 256) { // Palette is fully initialized.
 				dx::Flush(dx::fake[dx::flip]);
 			} else {
+				if (dx::enabled == 1) dx::Flush(dx::fake[dx::flip]); // Initial draw.
 				dx::enabled += dwCount;
 			}
 		}
