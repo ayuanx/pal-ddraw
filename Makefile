@@ -9,4 +9,4 @@ ddraw.dll: classfactory.cpp clipper.cpp color.cpp dd.cpp dds.cpp dllmain.cpp gam
 	gcc -m32 -static-libgcc -Wl,--enable-stdcall-fixup -s -O2 -shared -o ddraw.dll classfactory.cpp clipper.cpp color.cpp dd.cpp dds.cpp dllmain.cpp dx.cpp gama.cpp log.cpp palette.cpp unknwn.cpp wrap.cpp exports.def ddraw.rc.o -lddraw -lgdi32 -lwinmm
 
 clean:
-	rm -f ddraw.dll
+	rm -f ddraw.dll ddraw.rc.o
