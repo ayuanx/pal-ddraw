@@ -4,7 +4,7 @@ pal-ddraw is a wrapper of "ddraw.dll", which is used by many games and programs 
 
 pal-ddraw aims to support DirectDraw legacy 8-bit (256 colors) palette mode across all legacy and modern Windows versions when running in 16/24/32 bit color mode. 
 
-pal-ddraw emulates DirectDraw legacy 8-bit (256 colors) palette mode by falling back to GDI, which guarantees it can run natively with Win95/98/2K/Me/XP/Vista/7/8/10 on both real machines and virtual machines. 
+pal-ddraw emulates DirectDraw legacy 8-bit (256 colors) palette mode by falling back to GDI, which guarantees it can run natively with Win95/98/NT/2K/Me/XP/Vista/7/8/10 on both real machines and virtual machines. 
 
 # Why:
 
@@ -12,7 +12,7 @@ Many old games and programs were specifically designed to run only in DirectDraw
 
 Unfotunately both Windows and DirectDraw have dropped the support to legacy 8-bit color mode that requires a palette.
 
-These games and programs simply fail to run properly when Windows destop is set to 16/24/32 bit color mode.
+These games and programs simply fail to run properly when Windows desktop is set to 16/24/32 bit color mode.
 
 In many cases, changing the compatibility settting to 8-bit (256) color mode does not help at all because of DirectDraw.
 
