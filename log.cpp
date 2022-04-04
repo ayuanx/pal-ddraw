@@ -24,7 +24,7 @@ void __cdecl Log( const char* fmt, ... )
 		EnterCriticalSection(&log_lock); 
 		if( file == INVALID_HANDLE_VALUE )
 		{
-			file = CreateFile("ddwrapper.log", GENERIC_WRITE, 
+			file = CreateFile("ddraw.log", GENERIC_WRITE, 
 				FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
 			);
 			LeaveCriticalSection(&log_lock);

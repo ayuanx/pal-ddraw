@@ -57,4 +57,3 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName );
 #define WARN(x)     Log( "WARNING: %s %s\n", __FUNCTION__, x )
 #define INFO(...)   Log(__VA_ARGS__)
 */
-

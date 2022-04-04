@@ -104,12 +104,12 @@ namespace dd
 				lpDDSurfaceDesc->dwFlags = DDSD_BACKBUFFERCOUNT | DDSD_CAPS;
 				lpDDSurfaceDesc->dwBackBufferCount = 1;
 				lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
-				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::realFront, pUnkOuter);
+				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::real[0], pUnkOuter);
 				if (SUCCEEDED(hResult)) {
 					DDSCAPS ddsCaps = {0};
 					ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
-					dx::realFront->lpVtbl->GetAttachedSurface(dx::realFront, &ddsCaps, &dx::realBack);
-					INFO("realFront: %08X, realBack: %08X\n", dx::realFront, dx::realBack);
+					dx::real[0]->lpVtbl->GetAttachedSurface(dx::real[0], &ddsCaps, &dx::real[1]);
+					INFO("realFront: %08X, realBack: %08X\n", dx::real[0], dx::real[1]);
 					lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS | DDSD_PIXELFORMAT;
 					lpDDSurfaceDesc->dwHeight = dx::height;
 					lpDDSurfaceDesc->dwWidth = dx::width;
@@ -117,10 +117,12 @@ namespace dd
 					lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 					lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
 					lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;
-					hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fakeFront, pUnkOuter);
-					if (SUCCEEDED(hResult)) hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fakeBack, pUnkOuter);
-					*lplpDDSurface = dx::fakeFront;
-					INFO("fakeFront: %08X, fakeBack: %08X\n", dx::fakeFront, dx::fakeBack);
+					hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fake[1], pUnkOuter);
+					*lplpDDSurface = dx::fake[1];
+					Wrap(This->dd_parent, dd_to_dds_vtbl(This), (void**)lplpDDSurface);
+					if (SUCCEEDED(hResult)) hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fake[0], pUnkOuter);
+					*lplpDDSurface = dx::fake[0];
+					INFO("fakeFront: %08X, fakeBack: %08X\n", dx::fake[0], dx::fake[1]);
 				}
 			} else {
 				lpDDSurfaceDesc->dwFlags |= DDSD_PIXELFORMAT;
@@ -143,7 +145,9 @@ namespace dd
 	HRESULT __stdcall DuplicateSurface( WRAP* This, LPDIRECTDRAWSURFACE lpDDSurface, LPDIRECTDRAWSURFACE *lplpDupDDSurface )
 	{ 
 		PROLOGUE;
-		HRESULT hResult = This->dd1->lpVtbl->DuplicateSurface( This->dd1, GetInnerInterface( lpDDSurface ), lplpDupDDSurface );
+		lpDDSurface = GetInnerInterface(lpDDSurface);
+		HRESULT hResult = This->dd1->lpVtbl->DuplicateSurface(This->dd1, lpDDSurface, lplpDupDDSurface);
+		INFO("DuplicateSurface %08X -> %08X\n", lpDDSurface, *lplpDupDDSurface);
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, dd_to_dds_vtbl( This ), (void**)lplpDupDDSurface );
 		EPILOGUE( hResult );
 	}
@@ -200,6 +204,7 @@ namespace dd
 	{ 
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetGDISurface( This->dd1, lplpGDIDDSurface );
+		INFO("GetGDISurface %08X\n", *lplpGDIDDSurface);
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, dd_to_dds_vtbl( This ), (void**)lplpGDIDDSurface );
 		EPILOGUE( hResult );
 	}
