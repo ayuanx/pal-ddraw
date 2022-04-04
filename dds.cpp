@@ -333,7 +333,7 @@ namespace dds
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->Lock(sf, lpDestRect, lpDDSurfaceDesc, dwFlags, hEvent);
 		INFO("Lock %08X (%08X) : %08X\n", This->dds1, sf, dwFlags);
-		if (SUCCEEDED(hResult) && (dwFlags | DDLOCK_WRITEONLY)) dx::write = 1;
+		if (SUCCEEDED(hResult) && (dwFlags & DDLOCK_WRITEONLY)) dx::write = 1;
 		EPILOGUE( hResult );
 	}
 
@@ -428,7 +428,7 @@ namespace dds
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->Unlock(sf, lpData); 
 		INFO("Unlock %08X (%08X)\n", This->dds1, sf);
-		if (SUCCEEDED(hResult) && dx::write && This->dds1 == dx::fake[0]) { // Primary
+		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0] && dx::write) { // Primary
 			dx::write = 0;
 			dx::Flush(sf);
 		}
