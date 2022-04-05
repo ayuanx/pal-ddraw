@@ -108,8 +108,9 @@ namespace dd
 				if (SUCCEEDED(hResult)) {
 					DDSCAPS ddsCaps = {0};
 					ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
-					dx::real[0]->lpVtbl->GetAttachedSurface(dx::real[0], &ddsCaps, &dx::real[1]);
+					hResult = dx::real[0]->lpVtbl->GetAttachedSurface(dx::real[0], &ddsCaps, &dx::real[1]);
 					INFO("realFront: %08X, realBack: %08X\n", dx::real[0], dx::real[1]);
+
 					lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS | DDSD_PIXELFORMAT;
 					lpDDSurfaceDesc->dwHeight = dx::height;
 					lpDDSurfaceDesc->dwWidth = dx::width;
@@ -117,7 +118,7 @@ namespace dd
 					lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 					lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
 					lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;
-					hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fake[1], pUnkOuter);
+					if (SUCCEEDED(hResult)) hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fake[1], pUnkOuter);
 					*lplpDDSurface = dx::fake[1];
 					Wrap(This->dd_parent, dd_to_dds_vtbl(This), (void**)lplpDDSurface);
 					if (SUCCEEDED(hResult)) hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fake[0], pUnkOuter);
@@ -127,6 +128,7 @@ namespace dd
 			} else {
 				lpDDSurfaceDesc->dwFlags |= DDSD_CAPS | DDSD_PIXELFORMAT;
 				lpDDSurfaceDesc->ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
+				lpDDSurfaceDesc->ddsCaps.dwCaps &= ~DDSCAPS_VIDEOMEMORY;
 				lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 				lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
 				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;

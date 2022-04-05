@@ -16,24 +16,23 @@ namespace dx
 		else return in;
 	}
 
-	bool Flush(LPDIRECTDRAWSURFACE fk, DWORD to) {
+	HRESULT Flush(LPDIRECTDRAWSURFACE fk, DWORD to, DWORD dwFlags) {
+		HRESULT hResult;
 		DWORD now = 0;
-		if (to == 0) { // Capped at 30 FPS (30ms)
-			now = timeGetTime(); 
-			if (now - time < 30) return false;
+		if (to == 0) { // Palette is capped at 30 FPS (30ms)
+			now = GetTickCount(); 
+			if (now - time < 30) return DDERR_WASSTILLDRAWING;
 			time = now;
 		}
 		while (fk->lpVtbl->GetBltStatus(fk, DDGBS_ISBLTDONE) != DD_OK) Sleep(0);
 		HDC src, dest;
 		fk->lpVtbl->GetDC(fk, &src);
-		if (real[to]->lpVtbl->GetDC(real[to], &dest) == DDERR_SURFACELOST) {
-			real[to]->lpVtbl->Restore(real[to]);
-			real[to]->lpVtbl->GetDC(real[to], &dest);
-		}
+		while ((hResult = real[1]->lpVtbl->GetDC(real[1], &dest)) == DDERR_SURFACELOST) real[1]->lpVtbl->Restore(real[1]);
 		BitBlt(dest, 0, 0, width, height, src, 0, 0, SRCCOPY);
-		real[to]->lpVtbl->ReleaseDC(real[to], dest);
+		real[1]->lpVtbl->ReleaseDC(real[1], dest);
 		fk->lpVtbl->ReleaseDC(fk, src);
+		if (SUCCEEDED(hResult)) hResult = real[0]->lpVtbl->Flip(real[0], NULL, dwFlags);
 		INFO("Flush to real %d from fake %d @ %08X\n", to, fk == fake[0] ? 0 : fk == fake[1] ? 1 : -1, now);
-		return true;
+		return hResult;
 	}
 }

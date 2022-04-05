@@ -78,10 +78,14 @@ namespace dds
 	{ 	
 		PROLOGUE;
 		ULONG dwCount = WrapRelease( This );
-		// Release the real complex pair when the fake primary/secondary is released.
-		if ((This->dds1 == dx::fake[0] || This->dds1 == dx::fake[1]) && dx::real[0]) {
+		// Release implicit surfaces when the fake primary/secondary is released.
+		if (This->dds1 == dx::fake[0] || This->dds1 == dx::fake[1]) {
+			// fakes are not chained.
+			if (This->dds1 == dx::fake[0]) dx::fake[1]->lpVtbl->Release(dx::fake[1]);
+			else dx::fake[0]->lpVtbl->Release(dx::fake[0]);
+			dx::real[1]->lpVtbl->Release(dx::real[1]);
 			dx::real[0]->lpVtbl->Release(dx::real[0]);
-			dx::real[0] = dx::real[1] = NULL;
+			dx::real[0] = dx::real[1] = dx::fake[0] = dx::fake[1] = NULL;
 		}
 		EPILOGUE( dwCount );
 	}
@@ -143,7 +147,7 @@ namespace dds
 			LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 			hResult = sf->lpVtbl->Blt(sf, lpDestRect, src, lpSrcRect, dwFlags, lpDDBltFx); 
 			INFO("Blt %08X (%08X) <- %08X (%08X) : %08X\n", This->dds1, sf, lpDDSrcSurface, src, dwFlags);
-			if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Primary
+			if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Front
 				dx::Flush(sf);
 			}
 		}
@@ -169,7 +173,7 @@ namespace dds
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->BltFast(sf, dwX, dwY, src, lpSrcRect, dwTrans);
 		INFO("BltFast %08X (%08X) <- %08X (%08X) : %08X\n", This->dds1, sf, lpDDSrcSurface, src, dwTrans);
-		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Primary
+		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Front
 			dx::Flush(sf);
 		}
 		EPILOGUE( hResult );  
@@ -216,13 +220,11 @@ namespace dds
 	HRESULT __stdcall Flip( WRAP* This, LPDIRECTDRAWSURFACE lpDDSurfaceTargetOverride, DWORD dwFlags ) 
 	{ 
 		PROLOGUE;
-		HRESULT hResult = DDERR_WASSTILLDRAWING;
+		HRESULT hResult;
 		if (dx::enabled) {
-			if (dx::Flush(dx::fake[!dx::flip], 1)) { // Secondary
-				hResult = dx::real[0]->lpVtbl->Flip(dx::real[0], NULL, dwFlags);
-				INFO("Flip to fake %d : %08X\n", !dx::flip, dwFlags);
-				if (SUCCEEDED(hResult)) dx::flip = !dx::flip;
-			}
+			hResult = dx::Flush(dx::fake[!dx::flip], 1, dwFlags); // Back
+			INFO("Flip to fake %d : %08X\n", !dx::flip, dwFlags);
+			if (SUCCEEDED(hResult)) dx::flip = !dx::flip;
 		} else {
 			hResult = This->dds1->lpVtbl->Flip( This->dds1, GetInnerInterface( lpDDSurfaceTargetOverride ), dwFlags );
 		}
@@ -233,7 +235,7 @@ namespace dds
 	{ 
 		PROLOGUE;
 		HRESULT hResult = DD_OK;
-		if (This->dds1 == dx::fake[0]) { // Primary
+		if (This->dds1 == dx::fake[0]) { // Front
 			*lplpDDAttachedSurface = dx::fake[1];
 		} else {
 			hResult = This->dds1->lpVtbl->GetAttachedSurface( This->dds1, lpDDSCaps, lplpDDAttachedSurface );
@@ -348,7 +350,7 @@ namespace dds
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->ReleaseDC(sf, hDC);
 		INFO("ReleaseDC %08X (%98X)\n", This->dds1, sf);
-		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Primary
+		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Front
 			dx::Flush(sf);
 		}
 		EPILOGUE( hResult );
@@ -413,7 +415,7 @@ namespace dds
 		lpDDPalette = GetInnerInterface(lpDDPalette);
 		hResult = This->dds1->lpVtbl->SetPalette(This->dds1, lpDDPalette);
 		INFO("SetPalette %08X to %08X\n", lpDDPalette, This->dds1);
-		if (This->dds1 == dx::fake[0]) { // Primary
+		if (This->dds1 == dx::fake[0]) { // Front
 			dx::fake[1]->lpVtbl->SetPalette(dx::fake[1], lpDDPalette);
 			dx::palette = lpDDPalette;
 		}
@@ -433,7 +435,7 @@ namespace dds
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->Unlock(sf, lpData); 
 		INFO("Unlock %08X (%08X)\n", This->dds1, sf);
-		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0] && dx::write) { // Primary
+		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0] && dx::write) { // Front
 			dx::write = 0;
 			dx::Flush(sf);
 		}

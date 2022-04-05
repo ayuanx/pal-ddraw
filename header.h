@@ -20,5 +20,5 @@ namespace color { struct XVTBL; extern const XVTBL xVtbl; };
 namespace gama { struct XVTBL; extern const XVTBL xVtbl; };
 namespace unknwn { struct XVTBL; extern const XVTBL xVtbl; };
 
-namespace dx { extern DWORD enabled, write, flip, width, height; extern LPDIRECTDRAWPALETTE palette; extern LPDIRECTDRAWSURFACE real[2], fake[2]; LPDIRECTDRAWSURFACE MatchFlip(LPDIRECTDRAWSURFACE); bool Flush(LPDIRECTDRAWSURFACE, DWORD = 0); };
+namespace dx { extern DWORD enabled, write, flip, width, height; extern LPDIRECTDRAWPALETTE palette; extern LPDIRECTDRAWSURFACE real[2], fake[2]; LPDIRECTDRAWSURFACE MatchFlip(LPDIRECTDRAWSURFACE); HRESULT Flush(LPDIRECTDRAWSURFACE, DWORD = 0, DWORD = DDFLIP_WAIT); };
 
