@@ -78,6 +78,11 @@ namespace dds
 	{ 	
 		PROLOGUE;
 		ULONG dwCount = WrapRelease( This );
+		// Release the real complex pair when the fake primary/secondary is released.
+		if ((This->dds1 == dx::fake[0] || This->dds1 == dx::fake[1]) && dx::real[0]) {
+			dx::real[0]->lpVtbl->Release(dx::real[0]);
+			dx::real[0] = dx::real[1] = NULL;
+		}
 		EPILOGUE( dwCount );
 	}
 
