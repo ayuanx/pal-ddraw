@@ -44,6 +44,11 @@ Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, th
 
 # Revisions:
 
+v.2022.04.06:
+- Improve performance.
+- Proper release.
+- Bugfixes.
+
 v.2022.04.04:
 - Initial support of both Blt and Flip in full screen mode.
 

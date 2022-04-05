@@ -19,11 +19,14 @@ namespace dx
 	HRESULT Flush(LPDIRECTDRAWSURFACE fk, DWORD to, DWORD dwFlags) {
 		HRESULT hResult;
 		DWORD now = 0;
+
+#ifdef USE_THROTTLE
 		if (to == 0) { // Palette is capped at 30 FPS (30ms)
 			now = GetTickCount(); 
 			if (now - time < 30) return DDERR_WASSTILLDRAWING;
 			time = now;
 		}
+#endif
 		while (fk->lpVtbl->GetBltStatus(fk, DDGBS_ISBLTDONE) != DD_OK) Sleep(0);
 		HDC src, dest;
 		fk->lpVtbl->GetDC(fk, &src);
