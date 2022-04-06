@@ -77,15 +77,18 @@ namespace dds
 	ULONG __stdcall Release( WRAP* This ) 
 	{ 	
 		PROLOGUE;
-		ULONG dwCount = WrapRelease( This );
-		// Release implicit surfaces when the fake primary/secondary is released.
-		if (This->dds1 == dx::fake[0] || This->dds1 == dx::fake[1]) {
-			// fakes are not chained.
-			if (This->dds1 == dx::fake[0]) dx::fake[1]->lpVtbl->Release(dx::fake[1]);
-			else dx::fake[0]->lpVtbl->Release(dx::fake[0]);
-			dx::real[1]->lpVtbl->Release(dx::real[1]);
+		ULONG dwCount = WrapRelease(This);
+		if (This->dds1 == dx::fake[0]) { // Release real surfaces when the fake primary is released.
+			if (dx::fake[1]) { // fakes are not chained. We released them as if chained.
+				Wrap(This->dd_parent, This->xVtbl, (void**)&dx::fake[1]); // Get outter interface.
+				WrapRelease((WRAP*)dx::fake[1]);
+			}
+			dx::real[1]->lpVtbl->Release(dx::real[1]); // Release sequence matters for complex surfaces.
 			dx::real[0]->lpVtbl->Release(dx::real[0]);
 			dx::real[0] = dx::real[1] = dx::fake[0] = dx::fake[1] = NULL;
+		} else if (This->dds1 == dx::fake[1]) {
+			dwCount = 1; // Emulate complex surface release behavior.
+			dx::fake[1] = NULL;
 		}
 		EPILOGUE( dwCount );
 	}
@@ -340,7 +343,7 @@ namespace dds
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->Lock(sf, lpDestRect, lpDDSurfaceDesc, dwFlags, hEvent);
 		INFO("Lock %08X (%08X) : %08X\n", This->dds1, sf, dwFlags);
-		if (SUCCEEDED(hResult) && (dwFlags & DDLOCK_WRITEONLY)) dx::write = 1;
+		if (SUCCEEDED(hResult) && !(dwFlags & DDLOCK_READONLY)) dx::write = 1;
 		EPILOGUE( hResult );
 	}
 

@@ -1,5 +1,7 @@
 #include "header.h"
 
+#define USE_THROTTLE
+
 namespace dx
 {
 	DWORD enabled = 0;
@@ -23,7 +25,7 @@ namespace dx
 #ifdef USE_THROTTLE
 		if (to == 0) { // Palette is capped at 30 FPS (30ms)
 			now = GetTickCount(); 
-			if (now - time < 30) return DDERR_WASSTILLDRAWING;
+			if (now - time < 30) { WARN("DROP"); return DDERR_WASSTILLDRAWING; }
 			time = now;
 		}
 #endif

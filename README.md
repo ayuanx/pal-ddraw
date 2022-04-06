@@ -46,7 +46,7 @@ Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, th
 
 v.2022.04.06:
 - Improve performance.
-- Proper release.
+- Proper release sequence.
 - Bugfixes.
 
 v.2022.04.04:
