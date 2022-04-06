@@ -101,14 +101,21 @@ namespace dd
 		HRESULT hResult;
 		if (dx::enabled) {
 			if (lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) {
-				lpDDSurfaceDesc->dwFlags = DDSD_BACKBUFFERCOUNT | DDSD_CAPS;
-				lpDDSurfaceDesc->dwBackBufferCount = 1;
-				lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
+				if (dx::caps) {
+					lpDDSurfaceDesc->dwFlags = DDSD_BACKBUFFERCOUNT | DDSD_CAPS;
+					lpDDSurfaceDesc->dwBackBufferCount = 1;
+					lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
+				} else {
+					lpDDSurfaceDesc->dwFlags = DDSD_CAPS;
+					lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
+				}
 				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::real[0], pUnkOuter);
 				if (SUCCEEDED(hResult)) {
-					DDSCAPS ddsCaps = {0};
-					ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
-					hResult = dx::real[0]->lpVtbl->GetAttachedSurface(dx::real[0], &ddsCaps, &dx::real[1]);
+					if (dx::caps) {
+						DDSCAPS ddsCaps = {0};
+						ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
+						hResult = dx::real[0]->lpVtbl->GetAttachedSurface(dx::real[0], &ddsCaps, &dx::real[1]);
+					}
 					INFO("realFront: %08X, realBack: %08X\n", dx::real[0], dx::real[1]);
 
 					lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS | DDSD_PIXELFORMAT;
@@ -250,6 +257,11 @@ namespace dd
 	HRESULT __stdcall SetCooperativeLevel( WRAP* This, HWND hWnd, DWORD dwFlags ) 
 	{ 		
 		PROLOGUE;
+		DDCAPS ddcaps = {0};
+		ddcaps.dwSize = sizeof(ddcaps);
+		This->dd1->lpVtbl->GetCaps(This->dd1, &ddcaps, NULL);
+		if (ddcaps.ddsCaps.dwCaps & DDSCAPS_FLIP) dx::caps = 1;
+		INFO("DDCAPS.DDSCAPS.DWCAPS %08X %d\n", ddcaps.ddsCaps.dwCaps, dx::caps);
 		HRESULT hResult = This->dd1->lpVtbl->SetCooperativeLevel( This->dd1, hWnd, dwFlags );
 		EPILOGUE( hResult );
 	}

@@ -5,6 +5,7 @@
 namespace dx
 {
 	DWORD enabled = 0;
+	DWORD caps = 0;
 	DWORD write = 0;
 	DWORD flip = 0;
 	DWORD time = 0;
@@ -32,11 +33,11 @@ namespace dx
 		while (fk->lpVtbl->GetBltStatus(fk, DDGBS_ISBLTDONE) != DD_OK) Sleep(0);
 		HDC src, dest;
 		fk->lpVtbl->GetDC(fk, &src);
-		while ((hResult = real[1]->lpVtbl->GetDC(real[1], &dest)) == DDERR_SURFACELOST) real[1]->lpVtbl->Restore(real[1]);
+		while ((hResult = real[caps]->lpVtbl->GetDC(real[caps], &dest)) == DDERR_SURFACELOST) real[caps]->lpVtbl->Restore(real[caps]);
 		BitBlt(dest, 0, 0, width, height, src, 0, 0, SRCCOPY);
-		real[1]->lpVtbl->ReleaseDC(real[1], dest);
+		real[caps]->lpVtbl->ReleaseDC(real[caps], dest);
 		fk->lpVtbl->ReleaseDC(fk, src);
-		if (SUCCEEDED(hResult)) hResult = real[0]->lpVtbl->Flip(real[0], NULL, dwFlags);
+		if (SUCCEEDED(hResult) && caps) hResult = real[0]->lpVtbl->Flip(real[0], NULL, dwFlags);
 		INFO("Flush to real %d from fake %d @ %08X\n", to, fk == fake[0] ? 0 : fk == fake[1] ? 1 : -1, now);
 		return hResult;
 	}

@@ -83,7 +83,7 @@ namespace dds
 				Wrap(This->dd_parent, This->xVtbl, (void**)&dx::fake[1]); // Get outter interface.
 				WrapRelease((WRAP*)dx::fake[1]);
 			}
-			dx::real[1]->lpVtbl->Release(dx::real[1]); // Release sequence matters for complex surfaces.
+			if (dx::caps) dx::real[1]->lpVtbl->Release(dx::real[1]); // Release sequence matters for complex surfaces.
 			dx::real[0]->lpVtbl->Release(dx::real[0]);
 			dx::real[0] = dx::real[1] = dx::fake[0] = dx::fake[1] = NULL;
 		} else if (This->dds1 == dx::fake[1]) {
