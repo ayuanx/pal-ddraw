@@ -32,11 +32,11 @@ Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, th
 
 # Notes:
 
-1. I know there are already several other DirectDraw wrappers, but they all forward the rendering to either Direct3D 8/9/10 or OpenGL2/Vulkan, which means they won't run on legacy OS like Win95/98/XP. My goal is support all legacy and modern OSes on both real machine and virtual machine.
+* I know there are already several other DirectDraw wrappers, but they all forward the rendering to either Direct3D 8/9/10 or OpenGL2/Vulkan, which means they won't run on legacy OS like Win95/98/XP. My goal is support all legacy and modern OSes on both real machine and virtual machine.
 
-2. Emulating DirectDraw palette by falling back to GDI inevitablly incurs some performance lost, but this should be negligible for old games whose native resolution is usually rather low like 640x480 or 800x600 and does not require a high refresh rate.
+* Emulating DirectDraw palette by falling back to GDI inevitablly incurs some performance lost, but this should be negligible for old games whose native resolution is usually rather low like 640x480 or 800x600 and does not require a high refresh rate.
 
-3. Currently only full screen mode emulation is implemented. Window mode emulation may be implemented later. 
+* Currently only full screen mode emulation is implemented. Window mode emulation may be implemented later. 
 
 # Building:
 
@@ -45,9 +45,13 @@ Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, th
 # Revisions:
 
 v.2022.04.06:
+- Configurable flip and throttle.
+
+v.2022.04.06:
 - Improve performance.
+- Improve compatibility.
 - Proper release sequence.
-- Bugfixes.
+- Bug fixes.
 
 v.2022.04.04:
 - Initial support of both Blt and Flip in full screen mode.

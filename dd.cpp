@@ -257,11 +257,14 @@ namespace dd
 	HRESULT __stdcall SetCooperativeLevel( WRAP* This, HWND hWnd, DWORD dwFlags ) 
 	{ 		
 		PROLOGUE;
-		DDCAPS ddcaps = {0};
-		ddcaps.dwSize = sizeof(ddcaps);
-		This->dd1->lpVtbl->GetCaps(This->dd1, &ddcaps, NULL);
-		if (ddcaps.ddsCaps.dwCaps & DDSCAPS_FLIP) dx::caps = 1;
-		INFO("DDCAPS.DDSCAPS.DWCAPS %08X %d\n", ddcaps.ddsCaps.dwCaps, dx::caps);
+		if (dx::NoFlip) dx::caps = 0;
+		else {
+			DDCAPS ddcaps = {0};
+			ddcaps.dwSize = sizeof(ddcaps);
+			This->dd1->lpVtbl->GetCaps(This->dd1, &ddcaps, NULL);
+			if (ddcaps.ddsCaps.dwCaps & DDSCAPS_FLIP) dx::caps = 0;
+			INFO("DDCAPS.DDSCAPS.DWCAPS %08X %d\n", ddcaps.ddsCaps.dwCaps, dx::caps);
+		}
 		HRESULT hResult = This->dd1->lpVtbl->SetCooperativeLevel( This->dd1, hWnd, dwFlags );
 		EPILOGUE( hResult );
 	}

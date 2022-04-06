@@ -1,9 +1,10 @@
 #include "header.h"
 
-#define USE_THROTTLE
-
 namespace dx
 {
+	DWORD NoFlip = 0;
+	DWORD NoThrottle = 0;
+
 	DWORD enabled = 0;
 	DWORD caps = 0;
 	DWORD write = 0;
@@ -23,13 +24,12 @@ namespace dx
 		HRESULT hResult;
 		DWORD now = 0;
 
-#ifdef USE_THROTTLE
-		if (to == 0) { // Palette is capped at 30 FPS (30ms)
+		if (!NoThrottle && to == 0) { // Palette is capped at 30 FPS (30ms)
 			now = GetTickCount(); 
-			if (now - time < 30) { WARN("DROP"); return DDERR_WASSTILLDRAWING; }
+			if (now - time < 30) { WARN("DROP"); Sleep(0); return DDERR_WASSTILLDRAWING; }
 			time = now;
 		}
-#endif
+
 		while (fk->lpVtbl->GetBltStatus(fk, DDGBS_ISBLTDONE) != DD_OK) Sleep(0);
 		HDC src, dest;
 		fk->lpVtbl->GetDC(fk, &src);

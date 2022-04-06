@@ -1,5 +1,3 @@
-#pragma comment(linker, "/ENTRY:\"DllEntryPoint\"")
-
 #include "header.h"
 
 #define D3DERR_COMMAND_UNPARSED 0x88760BB8
@@ -53,68 +51,74 @@ GetDDSurfaceLocal_t				pGetDDSurfaceLocal;
 GetSurfaceFromDC_t				pGetSurfaceFromDC;
 RegisterSpecialCase_t			pRegisterSpecialCase;
 
-//#pragma warning( disable: 4996 )  // strcat is unsafe
-//#pragma intrinsic( strcat )
 BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 {
 	PROLOGUE;
 	UNREFERENCED_PARAMETER( lpvReserved );
 	switch(dwReason)
 	{
-	case DLL_PROCESS_ATTACH: 
-		{
-			InitializeCriticalSection(&cs);
-			GetSystemInfo(&sSysInfo);	
-			// load ddraw.dll from system32 dir
-			char szPath[ MAX_PATH ];
-			if( GetSystemDirectory( szPath, MAX_PATH - 10 ))
+		case DLL_PROCESS_ATTACH: 
 			{
-				strcat( szPath, "\\ddraw.dll" );
-				TRACE( szPath );
-				hRealDDraw = LoadLibrary( szPath );
-				if( hRealDDraw == hDll ) // this dll is NOT the real dll...
+				InitializeCriticalSection(&cs);
+				GetSystemInfo(&sSysInfo);	
+				// load ddraw.dll from system32 dir
+				char szPath[ MAX_PATH ];
+				if( GetSystemDirectory( szPath, MAX_PATH - 10 ))
 				{
-					FreeLibrary( hRealDDraw );
+					strcat( szPath, "\\ddraw.dll" );
+					TRACE( szPath );
+					hRealDDraw = LoadLibrary( szPath );
+					if( hRealDDraw == hDll ) // this dll is NOT the real dll...
+					{
+						FreeLibrary( hRealDDraw );
+					}
+					else
+					{
+						pDirectDrawCreate				= (DirectDrawCreate_t)				GetProcAddress( hRealDDraw, "DirectDrawCreate");
+						pDirectDrawCreateEx				= (DirectDrawCreateEx_t)			GetProcAddress( hRealDDraw, "DirectDrawCreateEx");
+						pDirectDrawCreateClipper		= (DirectDrawCreateClipper_t)		GetProcAddress( hRealDDraw, "DirectDrawCreateClipper");
+						pDirectDrawEnumerateA			= (DirectDrawEnumerateA_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateA");
+						//pDirectDrawEnumerateExA			= (DirectDrawEnumerateExA_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExA");
+						//pDirectDrawEnumerateExW			= (DirectDrawEnumerateExW_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExW");
+						//pDirectDrawEnumerateW			= (DirectDrawEnumerateW_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateW");
+						//pD3DParseUnknownCommand			= (D3DParseUnknownCommand_t)		GetProcAddress( hRealDDraw, "D3DParseUnknownCommand");
+						pDllGetClassObject				= (DllGetClassObject_t)				GetProcAddress( hRealDDraw, "DllGetClassObject");
+						pDllCanUnloadNow				= (DllCanUnloadNow_t)				GetProcAddress( hRealDDraw, "DllCanUnloadNow");
+						//pAcquireDDThreadLock			= (AcquireDDThreadLock_t)			GetProcAddress( hRealDDraw, "AcquireDDThreadLock");
+						//pReleaseDDThreadLock			= (ReleaseDDThreadLock_t)			GetProcAddress( hRealDDraw, "ReleaseDDThreadLock");
+						//pGetOLEThunkData				= (GetOLEThunkData_t)				GetProcAddress( hRealDDraw, "GetOLEThunkData");
+						//pSetAppCompatData				= (SetAppCompatData_t)				GetProcAddress( hRealDDraw, "SetAppCompatData");
+						//pCompleteCreateSysmemSurface	= (CompleteCreateSysmemSurface_t)	GetProcAddress( hRealDDraw, "CompleteCreateSysmemSurface");
+						//pDDGetAttachedSurfaceLcl		= (DDGetAttachedSurfaceLcl_t)		GetProcAddress( hRealDDraw, "DDGetAttachedSurfaceLcl");
+						//pDDInternalLock					= (DDInternalLock_t)				GetProcAddress( hRealDDraw, "DDInternalLock");
+						//pDDInternalUnlock				= (DDInternalUnlock_t)				GetProcAddress( hRealDDraw, "DDInternalUnlock");
+						//pDSoundHelp						= (DSoundHelp_t)					GetProcAddress( hRealDDraw, "DSoundHelp" );
+						//pGetDDSurfaceLocal				= (GetDDSurfaceLocal_t)				GetProcAddress( hRealDDraw, "GetDDSurfaceLocal" );
+						//pGetSurfaceFromDC				= (GetSurfaceFromDC_t)				GetProcAddress( hRealDDraw, "GetSurfaceFromDC" );
+						//pRegisterSpecialCase			= (RegisterSpecialCase_t)			GetProcAddress( hRealDDraw, "RegisterSpecialCase" );
+					}
 				}
-				else
-				{
-					pDirectDrawCreate				= (DirectDrawCreate_t)				GetProcAddress( hRealDDraw, "DirectDrawCreate");
-					pDirectDrawCreateEx				= (DirectDrawCreateEx_t)			GetProcAddress( hRealDDraw, "DirectDrawCreateEx");
-					pDirectDrawCreateClipper		= (DirectDrawCreateClipper_t)		GetProcAddress( hRealDDraw, "DirectDrawCreateClipper");
-					pDirectDrawEnumerateA			= (DirectDrawEnumerateA_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateA");
-					//pDirectDrawEnumerateExA			= (DirectDrawEnumerateExA_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExA");
-					//pDirectDrawEnumerateExW			= (DirectDrawEnumerateExW_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExW");
-					//pDirectDrawEnumerateW			= (DirectDrawEnumerateW_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateW");
-					//pD3DParseUnknownCommand			= (D3DParseUnknownCommand_t)		GetProcAddress( hRealDDraw, "D3DParseUnknownCommand");
-					pDllGetClassObject				= (DllGetClassObject_t)				GetProcAddress( hRealDDraw, "DllGetClassObject");
-					pDllCanUnloadNow				= (DllCanUnloadNow_t)				GetProcAddress( hRealDDraw, "DllCanUnloadNow");
-					//pAcquireDDThreadLock			= (AcquireDDThreadLock_t)			GetProcAddress( hRealDDraw, "AcquireDDThreadLock");
-					//pReleaseDDThreadLock			= (ReleaseDDThreadLock_t)			GetProcAddress( hRealDDraw, "ReleaseDDThreadLock");
-					//pGetOLEThunkData				= (GetOLEThunkData_t)				GetProcAddress( hRealDDraw, "GetOLEThunkData");
-					//pSetAppCompatData				= (SetAppCompatData_t)				GetProcAddress( hRealDDraw, "SetAppCompatData");
-					//pCompleteCreateSysmemSurface	= (CompleteCreateSysmemSurface_t)	GetProcAddress( hRealDDraw, "CompleteCreateSysmemSurface");
-					//pDDGetAttachedSurfaceLcl		= (DDGetAttachedSurfaceLcl_t)		GetProcAddress( hRealDDraw, "DDGetAttachedSurfaceLcl");
-					//pDDInternalLock					= (DDInternalLock_t)				GetProcAddress( hRealDDraw, "DDInternalLock");
-					//pDDInternalUnlock				= (DDInternalUnlock_t)				GetProcAddress( hRealDDraw, "DDInternalUnlock");
-					//pDSoundHelp						= (DSoundHelp_t)					GetProcAddress( hRealDDraw, "DSoundHelp" );
-					//pGetDDSurfaceLocal				= (GetDDSurfaceLocal_t)				GetProcAddress( hRealDDraw, "GetDDSurfaceLocal" );
-					//pGetSurfaceFromDC				= (GetSurfaceFromDC_t)				GetProcAddress( hRealDDraw, "GetSurfaceFromDC" );
-					//pRegisterSpecialCase			= (RegisterSpecialCase_t)			GetProcAddress( hRealDDraw, "RegisterSpecialCase" );
+
+				GetModuleFileName(hDll, szPath, MAX_PATH - 4);
+				char *last = strrchr(szPath, '.');
+				if (last) {
+					*last = '\0';
+					strcat(last, ".ini");
+					dx::NoFlip = GetPrivateProfileInt("PAL-DDRAW", "NoFlip", 0, szPath);
+					dx::NoThrottle = GetPrivateProfileInt("PAL-DDRAW", "NoThrottle", 0, szPath);
 				}
+				break;
 			}
+		case DLL_THREAD_ATTACH:
+		case DLL_THREAD_DETACH:
 			break;
-		}
-	case DLL_THREAD_ATTACH:
-	case DLL_THREAD_DETACH:
-		break;
-	case DLL_PROCESS_DETACH:
-		TRACE( "DLL_PROCESS_DETACH" );
-		FreeLibrary( hRealDDraw );
-		break;
+		case DLL_PROCESS_DETACH:
+			TRACE( "DLL_PROCESS_DETACH" );
+			FreeLibrary( hRealDDraw );
+			break;
 	}
 	EPILOGUE( TRUE );
 }
-#pragma warning( default: 4996 )
 
 typedef HRESULT (__stdcall* DirectDrawCreate_t)( GUID*, LPDIRECTDRAW*, IUnknown* );
 HRESULT __stdcall DirectDrawCreate( GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown* pUnkOuter )
@@ -378,11 +382,11 @@ DWORD __stdcall DDInternalUnlock( DWORD arg1 )
 } 
 
 /*
-If SetCooperativeLevel is called once in a process, a binding is established between the process and the window. 
-If it is called again in the same process with a different non-null window handle, it returns the DDERR_HWNDALREADYSET 
-error value. Some applications may receive this error value when DirectSound(R) specifies a different window handle than
-DirectDraw(R)—they should specify the same, top-level application window handle.
-*/
+   If SetCooperativeLevel is called once in a process, a binding is established between the process and the window. 
+   If it is called again in the same process with a different non-null window handle, it returns the DDERR_HWNDALREADYSET 
+   error value. Some applications may receive this error value when DirectSound(R) specifies a different window handle than
+   DirectDraw(R)—they should specify the same, top-level application window handle.
+   */
 HRESULT __stdcall DSoundHelp( DWORD arg1, DWORD arg2, DWORD arg3 )
 { 
 	// _internalSetAppHWnd( 0, arg1, 0, 0, arg2, arg3 );
@@ -432,5 +436,4 @@ HRESULT __stdcall RegisterSpecialCase( DWORD arg1, DWORD arg2, DWORD arg3, DWORD
 	}
 	EPILOGUE( hResult );
 }
-
 
