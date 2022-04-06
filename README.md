@@ -8,17 +8,17 @@ pal-ddraw emulates DirectDraw legacy 8-bit (256 colors) palette mode by falling 
 
 # Why:
 
-Many old games and programs were specifically designed to run only in DirectDraw 8-bit (256 colors) palette mode.
+Many old games and programs were specifically designed to run in DirectDraw 8-bit (256 colors) palette mode only.
 
-Unfotunately both Windows and DirectDraw have dropped the support to legacy 8-bit color mode that requires a palette.
+Unfotunately both Windows and DirectDraw have dropped the support for legacy 8-bit color mode that requires a palette.
 
-These games and programs simply fail to run properly when Windows desktop is set to 16/24/32 bit color mode.
+As a result, these old games and programs fail to run properly when Windows desktop is set to 16/24/32 bit color mode.
 
-In many cases, changing the compatibility settting to 8-bit (256) color mode does not help at all because of DirectDraw.
+In many cases, changing the compatibility setttings to 8-bit (256) color mode does not help at all because of DirectDraw.
 
-Even worse, they could also fail to run in virtual machine with a legacy OS like Win95/98/XP installled due to virtual driver issues.
+Even worse, they could also fail to run in a virtual machine with a legacy OS like Win95/98/XP installled due to virtual driver issues.
 
-In such cases, pal-ddraw may help you, especially when you need to run on a legacy OS where Direct3D or OpenGL is not available.
+In such cases, pal-ddraw may help you, especially when you need to run on a legacy OS where Direct3D or OpenGL2 is not available.
 
 # Usage:
 
@@ -26,9 +26,11 @@ In such cases, pal-ddraw may help you, especially when you need to run on a lega
 
 Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, then you don't need this wrapper.
 
-2. Extract the dll file to the game folder where the game's main executable file is located.
+2. Extract the dll file and the ini file to the game folder where the game's main executable file is located.
 
-3. Run the game in full screen mode and enjoy the DirectDraw 8-bit (256 colors) palette emulation.
+3. (Optional) Change the configuration in "ddraw.ini" file if needed.
+
+4. Run the game in full screen mode and enjoy the DirectDraw 8-bit (256 colors) palette emulation.
 
 # Notes:
 
