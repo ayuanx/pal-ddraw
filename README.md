@@ -46,8 +46,8 @@ Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, th
 
 # Revisions:
 
-v.2022.04.06:
-- Configurable flip and throttle.
+v.2022.04.07:
+- Configurable flip, buffer and throttle.
 - Improve performance.
 - Improve compatibility.
 - Proper release sequence.

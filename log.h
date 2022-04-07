@@ -14,9 +14,6 @@
 	they exist in case someone wants them for debugging
 */
 
-//extern "C" void * _ReturnAddress( void );
-//#pragma intrinsic( _ReturnAddress )
-
 void __cdecl Log( const char* fmt, ... );
 void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc );
 void LogGUID( const GUID& riid );
@@ -38,7 +35,7 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName );
 #undef INFO
 #define EPILOGUE(x) if(FAILED(x)){Log( "%08X %08X %s\n", x, __builtin_return_address(0), __FUNCTION__ );} return(x)
 #define LOG_GUID(x) LogGUID( x )
-#define WARN(x)     Log( "WARNING: %s\n", x ) 
+#define WARN(x)     Log( "WARNING: %s\n", x )
 #define INFO(...)   Log(__VA_ARGS__)
 */
 

@@ -1,5 +1,3 @@
-#pragma once
-
 #define INITGUID
 #define CINTERFACE 
 

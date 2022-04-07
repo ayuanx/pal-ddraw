@@ -4,8 +4,8 @@ namespace dds
 {
 	struct XVTBL
 	{
-		HRESULT (__stdcall * QueryInterface)( WRAP* This, const IID& riid, void** ppvObject ); 
-		ULONG   (__stdcall * AddRef)( WRAP* This ); 
+		HRESULT (__stdcall * QueryInterface)( WRAP* This, const IID& riid, void** ppvObject );
+		ULONG   (__stdcall * AddRef)( WRAP* This );
 		ULONG   (__stdcall * Release)( WRAP* This );
 		HRESULT (__stdcall * AddAttachedSurface)( WRAP* This, LPDIRECTDRAWSURFACE lpDDSAttachedSurface );
 		HRESULT (__stdcall * AddOverlayDirtyRect)( WRAP* This, LPRECT lpRect );
@@ -16,7 +16,7 @@ namespace dds
 		HRESULT (__stdcall * EnumAttachedSurfaces)( WRAP* This, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpEnumSurfacesCallback );
 		HRESULT (__stdcall * EnumOverlayZOrders)( WRAP* This, DWORD dwFlags, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpfnCallback );
 		HRESULT (__stdcall * Flip)( WRAP* This, LPDIRECTDRAWSURFACE lpDDSurfaceTargetOverride, DWORD dwFlags );
-		HRESULT (__stdcall * GetAttachedSurface)( WRAP* This, LPDDSCAPS lpDDSCaps, LPDIRECTDRAWSURFACE *lplpDDAttachedSurface ); 
+		HRESULT (__stdcall * GetAttachedSurface)( WRAP* This, LPDDSCAPS lpDDSCaps, LPDIRECTDRAWSURFACE *lplpDDAttachedSurface );
 		HRESULT (__stdcall * GetBltStatus)( WRAP* This, DWORD dwFlags );
 		HRESULT (__stdcall * GetCaps)( WRAP* This, LPDDSCAPS lpDDSCaps );
 		HRESULT (__stdcall * GetClipper)( WRAP* This, LPDIRECTDRAWCLIPPER *lplpDDClipper );
@@ -41,7 +41,7 @@ namespace dds
 		HRESULT (__stdcall * UpdateOverlayDisplay)( WRAP* This, DWORD dwFlags );
 		HRESULT (__stdcall * UpdateOverlayZOrder)( WRAP* This, DWORD dwFlags, LPDIRECTDRAWSURFACE lpDDSReference );
 		// added in v2
-		HRESULT (__stdcall * GetDDInterface)( WRAP* This, LPVOID *lplpDD ); 
+		HRESULT (__stdcall * GetDDInterface)( WRAP* This, LPVOID *lplpDD );
 		HRESULT (__stdcall * PageLock)( WRAP* This, DWORD dwFlags );
 		HRESULT (__stdcall * PageUnlock)( WRAP* This, DWORD dwFlags );
 		// added in v3
@@ -59,22 +59,22 @@ namespace dds
 		HRESULT (__stdcall * GetLOD)( WRAP* This, LPDWORD lod );
 	};
 
-	HRESULT __stdcall QueryInterface( WRAP* This, const IID& riid, void** ppvObject ) 
-	{ 
+	HRESULT __stdcall QueryInterface( WRAP* This, const IID& riid, void** ppvObject )
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->QueryInterface( This->dds1, riid, ppvObject );
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, iid_to_vtbl( riid ), ppvObject );
 		EPILOGUE( hResult );
 	}
 
-	ULONG __stdcall AddRef( WRAP* This ) 
-	{ 
+	ULONG __stdcall AddRef( WRAP* This )
+	{
 		PROLOGUE;
 		ULONG dwCount = This->dds1->lpVtbl->AddRef( This->dds1 );
-		EPILOGUE( dwCount ); 
+		EPILOGUE( dwCount );
 	}
 
-	ULONG __stdcall Release( WRAP* This ) 
+	ULONG __stdcall Release( WRAP* This )
 	{ 	
 		PROLOGUE;
 		ULONG dwCount = WrapRelease(This);
@@ -94,8 +94,8 @@ namespace dds
 		EPILOGUE( dwCount );
 	}
 
-	HRESULT __stdcall AddAttachedSurface( WRAP* This, LPDIRECTDRAWSURFACE lpDDSAttachedSurface ) 
-	{ 
+	HRESULT __stdcall AddAttachedSurface( WRAP* This, LPDIRECTDRAWSURFACE lpDDSAttachedSurface )
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->AddAttachedSurface( This->dds1, GetInnerInterface( lpDDSAttachedSurface ) );
 		if( SUCCEEDED( hResult ) )
@@ -111,7 +111,6 @@ namespace dds
 		HRESULT hResult = This->dds1->lpVtbl->AddOverlayDirtyRect( This->dds1, lpRect );
 		EPILOGUE( hResult );
 	}
-
 
 	HRESULT __stdcall Blt( WRAP* This, LPRECT lpDestRect, LPDIRECTDRAWSURFACE lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwFlags, LPDDBLTFX lpDDBltFx )
 	{ 		
@@ -149,7 +148,7 @@ namespace dds
 
 			LPDIRECTDRAWSURFACE src = dx::MatchFlip(lpDDSrcSurface);
 			LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
-			hResult = sf->lpVtbl->Blt(sf, lpDestRect, src, lpSrcRect, dwFlags, lpDDBltFx); 
+			hResult = sf->lpVtbl->Blt(sf, lpDestRect, src, lpSrcRect, dwFlags, lpDDBltFx);
 			INFO("Blt %08X (%08X) <- %08X (%08X) : %08X\n", This->dds1, sf, lpDDSrcSurface, src, dwFlags);
 			if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Front
 				dx::Flush(sf);
@@ -158,7 +157,7 @@ namespace dds
 		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall BltBatch( WRAP* This, LPDDBLTBATCH lpDDBltBatch, DWORD dwCount, DWORD dwFlags ) 
+	HRESULT __stdcall BltBatch( WRAP* This, LPDDBLTBATCH lpDDBltBatch, DWORD dwCount, DWORD dwFlags )
 	{	// This method was never implemented by ddraw?
 		PROLOGUE;
 		UNREFERENCED_PARAMETER( This );
@@ -166,10 +165,10 @@ namespace dds
 		UNREFERENCED_PARAMETER( dwCount );
 		UNREFERENCED_PARAMETER( dwFlags );
 		WARN( "E_NOTIMPL" );
-		EPILOGUE( E_NOTIMPL );  
+		EPILOGUE( E_NOTIMPL );
 	}
 
-	HRESULT __stdcall BltFast( WRAP* This, DWORD dwX, DWORD dwY, LPDIRECTDRAWSURFACE lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwTrans ) 
+	HRESULT __stdcall BltFast( WRAP* This, DWORD dwX, DWORD dwY, LPDIRECTDRAWSURFACE lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwTrans )
 	{
 		PROLOGUE;
 		lpDDSrcSurface = GetInnerInterface(lpDDSrcSurface);
@@ -180,7 +179,7 @@ namespace dds
 		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Front
 			dx::Flush(sf);
 		}
-		EPILOGUE( hResult );  
+		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall DeleteAttachedSurface( WRAP* This, DWORD dwFlags, LPDIRECTDRAWSURFACE lpDDSAttachedSurface)
@@ -191,12 +190,12 @@ namespace dds
 		{
 			lpDDSAttachedSurface->lpVtbl->Release( lpDDSAttachedSurface );		
 		}
-		EPILOGUE( hResult ); 
+		EPILOGUE( hResult );
 	}
 
 
-	HRESULT __stdcall EnumAttachedSurfaces( WRAP* This, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpEnumSurfacesCallback ) 
-	{ 
+	HRESULT __stdcall EnumAttachedSurfaces( WRAP* This, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpEnumSurfacesCallback )
+	{
 		PROLOGUE;
 		EnumStruct e;
 		e.callback = (void*)lpEnumSurfacesCallback;
@@ -205,10 +204,10 @@ namespace dds
 		e.xVtbl = This->xVtbl;
 		e.must_exist = true;
 		HRESULT hResult = This->dds1->lpVtbl->EnumAttachedSurfaces( This->dds1, &e, &WrapEnumSurfacesCallback );
-		EPILOGUE( hResult ); 
+		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall EnumOverlayZOrders( WRAP* This, DWORD dwFlags, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpfnCallback ) 
+	HRESULT __stdcall EnumOverlayZOrders( WRAP* This, DWORD dwFlags, LPVOID lpContext, LPDDENUMSURFACESCALLBACK lpfnCallback )
 	{
 		PROLOGUE;
 		EnumStruct e;
@@ -218,11 +217,11 @@ namespace dds
 		e.xVtbl = This->xVtbl;
 		e.must_exist = true;
 		HRESULT hResult = This->dds1->lpVtbl->EnumOverlayZOrders( This->dds1, dwFlags, &e, &WrapEnumSurfacesCallback );
-		EPILOGUE( hResult ); 
+		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall Flip( WRAP* This, LPDIRECTDRAWSURFACE lpDDSurfaceTargetOverride, DWORD dwFlags ) 
-	{ 
+	HRESULT __stdcall Flip( WRAP* This, LPDIRECTDRAWSURFACE lpDDSurfaceTargetOverride, DWORD dwFlags )
+	{
 		PROLOGUE;
 		HRESULT hResult;
 		if (dx::enabled) {
@@ -232,11 +231,11 @@ namespace dds
 		} else {
 			hResult = This->dds1->lpVtbl->Flip( This->dds1, GetInnerInterface( lpDDSurfaceTargetOverride ), dwFlags );
 		}
-		EPILOGUE( hResult ); 
+		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall GetAttachedSurface( WRAP* This, LPDDSCAPS lpDDSCaps, LPDIRECTDRAWSURFACE* lplpDDAttachedSurface ) 
-	{ 
+	HRESULT __stdcall GetAttachedSurface( WRAP* This, LPDDSCAPS lpDDSCaps, LPDIRECTDRAWSURFACE* lplpDDAttachedSurface )
+	{
 		PROLOGUE;
 		HRESULT hResult = DD_OK;
 		if (This->dds1 == dx::fake[0]) { // Front
@@ -249,37 +248,37 @@ namespace dds
 		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall GetBltStatus( WRAP* This, DWORD dwFlags ) 
+	HRESULT __stdcall GetBltStatus( WRAP* This, DWORD dwFlags )
 	{
 		PROLOGUE;
-		HRESULT hResult = This->dds1->lpVtbl->GetBltStatus( This->dds1, dwFlags ); 
+		HRESULT hResult = This->dds1->lpVtbl->GetBltStatus( This->dds1, dwFlags );
 		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall GetCaps( WRAP* This, LPDDSCAPS lpDDSCaps ) 
-	{ 
+	HRESULT __stdcall GetCaps( WRAP* This, LPDDSCAPS lpDDSCaps )
+	{
 		PROLOGUE;
-		HRESULT hResult = This->dds1->lpVtbl->GetCaps( This->dds1, lpDDSCaps ); 
+		HRESULT hResult = This->dds1->lpVtbl->GetCaps( This->dds1, lpDDSCaps );
 		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall GetClipper( WRAP* This, LPDIRECTDRAWCLIPPER *lplpDDClipper ) 
-	{ 
+	HRESULT __stdcall GetClipper( WRAP* This, LPDIRECTDRAWCLIPPER *lplpDDClipper )
+	{
 		PROLOGUE;
-		HRESULT hResult = This->dds1->lpVtbl->GetClipper( This->dds1, lplpDDClipper ); 
+		HRESULT hResult = This->dds1->lpVtbl->GetClipper( This->dds1, lplpDDClipper );
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawClipper ), (void**)lplpDDClipper );
 		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall GetColorKey( WRAP* This, DWORD dwFlags, LPDDCOLORKEY lpDDColorKey ) 
-	{ 
+	HRESULT __stdcall GetColorKey( WRAP* This, DWORD dwFlags, LPDDCOLORKEY lpDDColorKey )
+	{
 		PROLOGUE;
-		HRESULT hResult = This->dds1->lpVtbl->GetColorKey( This->dds1, dwFlags, lpDDColorKey ); 
+		HRESULT hResult = This->dds1->lpVtbl->GetColorKey( This->dds1, dwFlags, lpDDColorKey );
 		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall GetDC( WRAP* This, HDC *lphDC )
-	{ 
+	{
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->GetDC(sf, lphDC);
@@ -288,21 +287,21 @@ namespace dds
 	}
 
 	HRESULT __stdcall GetFlipStatus( WRAP* This, DWORD dwFlags )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->GetFlipStatus( This->dds1, dwFlags );
 		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall GetOverlayPosition( WRAP* This, LPLONG lplX, LPLONG lplY )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->GetOverlayPosition( This->dds1, lplX, lplY );
 		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall GetPalette( WRAP* This, LPDIRECTDRAWPALETTE *lplpDDPalette )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->GetPalette( This->dds1, lplpDDPalette );
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawPalette ), (void**)lplpDDPalette );
@@ -312,26 +311,26 @@ namespace dds
 	HRESULT __stdcall GetPixelFormat( WRAP* This, LPDDPIXELFORMAT lpDDPixelFormat )
 	{
 		PROLOGUE;
-		HRESULT hResult = This->dds1->lpVtbl->GetPixelFormat( This->dds1, lpDDPixelFormat ); 
+		HRESULT hResult = This->dds1->lpVtbl->GetPixelFormat( This->dds1, lpDDPixelFormat );
 		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall GetSurfaceDesc( WRAP* This, LPDDSURFACEDESC lpDDSurfaceDesc ) 
-	{ 
+	HRESULT __stdcall GetSurfaceDesc( WRAP* This, LPDDSURFACEDESC lpDDSurfaceDesc )
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->GetSurfaceDesc( This->dds1, lpDDSurfaceDesc );
 		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall Initialize( WRAP* This, LPDIRECTDRAW lpDD, LPDDSURFACEDESC lpDDSurfaceDesc )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->Initialize( This->dds1, GetInnerInterface( lpDD ), lpDDSurfaceDesc );
 		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall IsLost( WRAP* This )
-	{ 
+	{
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->IsLost(sf);
@@ -339,7 +338,7 @@ namespace dds
 	}
 
 	HRESULT __stdcall Lock( WRAP* This, LPRECT lpDestRect, LPDDSURFACEDESC lpDDSurfaceDesc, DWORD dwFlags, HANDLE hEvent )
-	{ 
+	{
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->Lock(sf, lpDestRect, lpDDSurfaceDesc, dwFlags, hEvent);
@@ -349,7 +348,7 @@ namespace dds
 	}
 
 	HRESULT __stdcall ReleaseDC( WRAP* This, HDC hDC )
-	{ 
+	{
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->ReleaseDC(sf, hDC);
@@ -361,7 +360,7 @@ namespace dds
 	}
 
 	HRESULT __stdcall Restore( WRAP* This )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->Restore(This->dds1);
 		INFO("Restore %08X\n", This->dds1);
@@ -370,17 +369,17 @@ namespace dds
 		EPILOGUE( hResult );
 	}
 
-	HRESULT __stdcall SetClipper( WRAP* This, LPDIRECTDRAWCLIPPER lpDDClipper ) 
-	{ 
+	HRESULT __stdcall SetClipper( WRAP* This, LPDIRECTDRAWCLIPPER lpDDClipper )
+	{
 		PROLOGUE;
 		HRESULT hResult;
 		LPDIRECTDRAWCLIPPER old_clipper = NULL;
-		hResult = This->dds1->lpVtbl->GetClipper( This->dds1, &old_clipper ); 
+		hResult = This->dds1->lpVtbl->GetClipper( This->dds1, &old_clipper );
 		if( SUCCEEDED( hResult ) )
 		{
 			Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawClipper ), (void**)&old_clipper );
 		}
-		hResult = This->dds1->lpVtbl->SetClipper( This->dds1, GetInnerInterface( lpDDClipper ) ); 
+		hResult = This->dds1->lpVtbl->SetClipper( This->dds1, GetInnerInterface( lpDDClipper ) );
 		if( old_clipper != NULL )
 		{
 			old_clipper->lpVtbl->Release( old_clipper );
@@ -389,7 +388,7 @@ namespace dds
 	}
 
 	HRESULT __stdcall SetColorKey( WRAP* This, DWORD dwFlags, LPDDCOLORKEY lpDDColorKey )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->SetColorKey( This->dds1, dwFlags, lpDDColorKey );
 		INFO("SetColorKey L:%08X H:%08X to %08X : %08X\n", lpDDColorKey->dwColorSpaceLowValue, lpDDColorKey->dwColorSpaceHighValue, This->dds1, dwFlags);
@@ -406,11 +405,11 @@ namespace dds
 	}
 
 	HRESULT __stdcall SetPalette( WRAP* This, LPDIRECTDRAWPALETTE lpDDPalette )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult;
 		LPDIRECTDRAWPALETTE old_palette = NULL;
-		hResult = This->dds1->lpVtbl->GetPalette( This->dds1, &old_palette ); 
+		hResult = This->dds1->lpVtbl->GetPalette( This->dds1, &old_palette );
 		if( SUCCEEDED( hResult ) )
 		{
 			Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawPalette ), (void**)&old_palette );
@@ -433,11 +432,11 @@ namespace dds
 
 	// lpData is ddsd.lpSurface in version 1, 2, and 3
 	// lpData is lpRect in versions 4 and 7
-	HRESULT __stdcall Unlock( WRAP* This, LPVOID lpData ) 
-	{ 
+	HRESULT __stdcall Unlock( WRAP* This, LPVOID lpData )
+	{
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
-		HRESULT hResult = sf->lpVtbl->Unlock(sf, lpData); 
+		HRESULT hResult = sf->lpVtbl->Unlock(sf, lpData);
 		INFO("Unlock %08X (%08X)\n", This->dds1, sf);
 		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0] && dx::write) { // Front
 			dx::write = 0;
@@ -447,14 +446,14 @@ namespace dds
 	}
 
 	HRESULT __stdcall UpdateOverlay( WRAP* This, LPRECT lpSrcRect, LPDIRECTDRAWSURFACE lpDDDestSurface, LPRECT lpDestRect, DWORD dwFlags, LPDDOVERLAYFX lpDDOverlayFx )
-	{ 
+	{
 		PROLOGUE;
 		DDOVERLAYFX fx;
 
 		// unwrap interfaces in the DDOVERLAYFX structure if used //
 		if( dwFlags & ( DDOVER_ALPHADESTSURFACEOVERRIDE | DDOVER_ALPHASRCSURFACEOVERRIDE ) )
 		{
-			if( ( lpDDOverlayFx != NULL ) && ( sizeof( fx ) <= lpDDOverlayFx->dwSize ) ) 
+			if( ( lpDDOverlayFx != NULL ) && ( sizeof( fx ) <= lpDDOverlayFx->dwSize ) )
 			{
 				memcpy( &fx, lpDDOverlayFx, sizeof(fx) );
 				if( dwFlags & DDOVER_ALPHADESTSURFACEOVERRIDE ) fx.lpDDSAlphaDest   = GetInnerInterface( fx.lpDDSAlphaDest   );
@@ -469,30 +468,30 @@ namespace dds
 	}
 
 	HRESULT __stdcall UpdateOverlayDisplay( WRAP* This, DWORD dwFlags )
-	{ 
+	{
 		PROLOGUE;
-		HRESULT hResult = This->dds1->lpVtbl->UpdateOverlayDisplay( This->dds1, dwFlags ); 
+		HRESULT hResult = This->dds1->lpVtbl->UpdateOverlayDisplay( This->dds1, dwFlags );
 		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall UpdateOverlayZOrder( WRAP* This, DWORD dwFlags, LPDIRECTDRAWSURFACE lpDDSReference )
-	{ 
+	{
 		PROLOGUE;
 		//if( dwFlags & ( DDOVERZ_INSERTINBACKOF | DDOVERZ_INSERTINFRONTOF ) ) lpDDSReference = GetInnerInterface( lpDDSReference );
-		HRESULT hResult = This->dds1->lpVtbl->UpdateOverlayZOrder( This->dds1, dwFlags, lpDDSReference ); 
+		HRESULT hResult = This->dds1->lpVtbl->UpdateOverlayZOrder( This->dds1, dwFlags, lpDDSReference );
 		EPILOGUE( hResult );
 	}
 
 	// v2 //
 
-	HRESULT __stdcall GetDDInterface( WRAP* This, LPVOID* lplpDD ) 
-	{ 
+	HRESULT __stdcall GetDDInterface( WRAP* This, LPVOID* lplpDD )
+	{
 		// theoretically returns IUnknown but some programs may cast it to a different interface pointer...
 		// instead of querying for the interface.
 		PROLOGUE;
 		HRESULT hResult = This->dds2->lpVtbl->GetDDInterface( This->dds2, lplpDD );
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, dds_to_dd_vtbl( This ), (void**)lplpDD );
-		EPILOGUE( hResult ); 
+		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall PageLock( WRAP* This, DWORD dwFlags )
@@ -506,7 +505,7 @@ namespace dds
 	{
 		PROLOGUE;
 		HRESULT hResult = This->dds2->lpVtbl->PageUnlock( This->dds2, dwFlags );
-		EPILOGUE( hResult ); 
+		EPILOGUE( hResult );
 	}
 
 	// v3 //
@@ -521,7 +520,7 @@ namespace dds
 	// v4 //
 
 	HRESULT __stdcall SetPrivateData( WRAP* This, const GUID & tag, LPVOID pData, DWORD cbSize, DWORD dwFlags )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds4->lpVtbl->SetPrivateData( This->dds4, tag, pData, cbSize, dwFlags );
 		EPILOGUE( hResult );
@@ -544,12 +543,12 @@ namespace dds
 	HRESULT __stdcall GetUniquenessValue( WRAP* This, LPDWORD pValue )
 	{
 		PROLOGUE;
-		HRESULT hResult = This->dds4->lpVtbl->GetUniquenessValue( This->dds4, pValue ); 
+		HRESULT hResult = This->dds4->lpVtbl->GetUniquenessValue( This->dds4, pValue );
 		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall ChangeUniquenessValue( WRAP* This )
-	{ 
+	{
 		PROLOGUE;
 		HRESULT hResult = This->dds4->lpVtbl->ChangeUniquenessValue( This->dds4 );
 		EPILOGUE( hResult );
@@ -628,13 +627,13 @@ namespace dds
 		0, // 0x9C
 		0, // 0xA0
 		0, // 0xA4
-		0, // 0xA8  
-		0, // 0xAC 
+		0, // 0xA8
+		0, // 0xAC
 		0, // 0xB0
 		0, // 0xB4
 		0, // 0xB8
 		0, // 0xBC
-		0  // 0xC0
+		0, // 0xC0
 	};
 
 	const XVTBL xVtbl2 = {
@@ -680,13 +679,13 @@ namespace dds
 		0, // 0x9C
 		0, // 0xA0
 		0, // 0xA4
-		0, // 0xA8  
-		0, // 0xAC 
+		0, // 0xA8
+		0, // 0xAC
 		0, // 0xB0
 		0, // 0xB4
 		0, // 0xB8
 		0, // 0xBC
-		0  // 0xC0
+		0, // 0xC0
 	};
 
 	const XVTBL xVtbl3 = {
@@ -732,13 +731,13 @@ namespace dds
 		SetSurfaceDesc,         // 0x9C
 		0, // 0xA0
 		0, // 0xA4
-		0, // 0xA8  
-		0, // 0xAC 
+		0, // 0xA8
+		0, // 0xAC
 		0, // 0xB0
 		0, // 0xB4
 		0, // 0xB8
 		0, // 0xBC
-		0  // 0xC0
+		0, // 0xC0
 	};
 
 	const XVTBL xVtbl4 = {
@@ -784,13 +783,13 @@ namespace dds
 		SetSurfaceDesc,         // 0x9C
 		SetPrivateData,         // 0xA0
 		GetPrivateData,         // 0xA4
-		FreePrivateData,        // 0xA8  
-		GetUniquenessValue,     // 0xAC 
+		FreePrivateData,        // 0xA8
+		GetUniquenessValue,     // 0xAC
 		ChangeUniquenessValue,  // 0xB0
 		0, // 0xB4
 		0, // 0xB8
 		0, // 0xBC
-		0  // 0xC0
+		0, // 0xC0
 	};
 
 	const XVTBL xVtbl7 = {
@@ -836,12 +835,12 @@ namespace dds
 		SetSurfaceDesc,         // 0x9C
 		SetPrivateData,         // 0xA0
 		GetPrivateData,         // 0xA4
-		FreePrivateData,        // 0xA8  
-		GetUniquenessValue,     // 0xAC 
+		FreePrivateData,        // 0xA8
+		GetUniquenessValue,     // 0xAC
 		ChangeUniquenessValue,  // 0xB0
 		SetPriority,            // 0xB4
 		GetPriority,            // 0xB8
 		SetLOD,                 // 0xBC
-		GetLOD                  // 0xC0
+		GetLOD,                 // 0xC0
 	};
 };

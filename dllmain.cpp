@@ -14,8 +14,8 @@ typedef HRESULT (__stdcall* D3DParseUnknownCommand_t  )( LPVOID lpCmd, LPVOID *l
 typedef HRESULT (__stdcall* DllCanUnloadNow_t)();
 //
 // undocumented
-typedef DWORD    (__stdcall* AcquireDDThreadLock_t         )();
-typedef DWORD    (__stdcall* ReleaseDDThreadLock_t         )();
+typedef DWORD   (__stdcall* AcquireDDThreadLock_t         )();
+typedef DWORD   (__stdcall* ReleaseDDThreadLock_t         )();
 typedef DWORD   (__stdcall* GetOLEThunkData_t             )( DWORD index );
 typedef DWORD   (__stdcall* SetAppCompatData_t            )( DWORD index, DWORD data );
 typedef DWORD   (__stdcall* CompleteCreateSysmemSurface_t )( DWORD );
@@ -27,28 +27,28 @@ typedef HRESULT (__stdcall* GetDDSurfaceLocal_t           )( DWORD, DWORD, DWORD
 typedef HRESULT (__stdcall* GetSurfaceFromDC_t            )( DWORD, DWORD, DWORD );
 typedef HRESULT (__stdcall* RegisterSpecialCase_t         )( DWORD, DWORD, DWORD, DWORD );
 
-HMODULE							hRealDDraw;
-DirectDrawCreate_t				pDirectDrawCreate;
+HMODULE			hRealDDraw;
+DirectDrawCreate_t			pDirectDrawCreate;
 DirectDrawCreateEx_t			pDirectDrawCreateEx;
-DirectDrawCreateClipper_t		pDirectDrawCreateClipper;
+DirectDrawCreateClipper_t			pDirectDrawCreateClipper;
 DirectDrawEnumerateA_t			pDirectDrawEnumerateA;
-DirectDrawEnumerateExA_t		pDirectDrawEnumerateExA;
-DirectDrawEnumerateExW_t		pDirectDrawEnumerateExW;
+DirectDrawEnumerateExA_t			pDirectDrawEnumerateExA;
+DirectDrawEnumerateExW_t			pDirectDrawEnumerateExW;
 DirectDrawEnumerateW_t			pDirectDrawEnumerateW;
-D3DParseUnknownCommand_t		pD3DParseUnknownCommand;
-DllGetClassObject_t				pDllGetClassObject;
-DllCanUnloadNow_t				pDllCanUnloadNow;
+D3DParseUnknownCommand_t			pD3DParseUnknownCommand;
+DllGetClassObject_t			pDllGetClassObject;
+DllCanUnloadNow_t			pDllCanUnloadNow;
 AcquireDDThreadLock_t			pAcquireDDThreadLock;
 ReleaseDDThreadLock_t			pReleaseDDThreadLock;
-GetOLEThunkData_t				pGetOLEThunkData;
-SetAppCompatData_t				pSetAppCompatData;
-CompleteCreateSysmemSurface_t	pCompleteCreateSysmemSurface;
-DDGetAttachedSurfaceLcl_t		pDDGetAttachedSurfaceLcl;
-DDInternalLock_t				pDDInternalLock;
-DDInternalUnlock_t				pDDInternalUnlock;
+GetOLEThunkData_t			pGetOLEThunkData;
+SetAppCompatData_t			pSetAppCompatData;
+CompleteCreateSysmemSurface_t			pCompleteCreateSysmemSurface;
+DDGetAttachedSurfaceLcl_t			pDDGetAttachedSurfaceLcl;
+DDInternalLock_t			pDDInternalLock;
+DDInternalUnlock_t			pDDInternalUnlock;
 DSoundHelp_t                    pDSoundHelp;
-GetDDSurfaceLocal_t				pGetDDSurfaceLocal;
-GetSurfaceFromDC_t				pGetSurfaceFromDC;
+GetDDSurfaceLocal_t			pGetDDSurfaceLocal;
+GetSurfaceFromDC_t			pGetSurfaceFromDC;
 RegisterSpecialCase_t			pRegisterSpecialCase;
 
 BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
@@ -57,7 +57,7 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 	UNREFERENCED_PARAMETER( lpvReserved );
 	switch(dwReason)
 	{
-		case DLL_PROCESS_ATTACH: 
+		case DLL_PROCESS_ATTACH:
 			{
 				InitializeCriticalSection(&cs);
 				GetSystemInfo(&sSysInfo);	
@@ -137,7 +137,6 @@ HRESULT __stdcall DirectDrawCreate( GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown
 	EPILOGUE( hResult );
 }
 
-
 HRESULT __stdcall DirectDrawCreateEx( GUID* lpGUID, LPVOID* lplpDD, REFIID iid, IUnknown* pUnkOuter )
 {	
 	PROLOGUE;
@@ -153,7 +152,6 @@ HRESULT __stdcall DirectDrawCreateEx( GUID* lpGUID, LPVOID* lplpDD, REFIID iid, 
 	EPILOGUE( hResult );
 }
 
-
 HRESULT __stdcall DirectDrawCreateClipper( DWORD dwFlags, LPDIRECTDRAWCLIPPER FAR *lplpDDClipper,  IUnknown FAR *pUnkOuter )
 {	
 	PROLOGUE;
@@ -162,13 +160,12 @@ HRESULT __stdcall DirectDrawCreateClipper( DWORD dwFlags, LPDIRECTDRAWCLIPPER FA
 	{
 		hResult = pDirectDrawCreateClipper( dwFlags, lplpDDClipper, pUnkOuter );
 		if( SUCCEEDED( hResult) )
-		{ 
+		{
 			Wrap( NULL, iid_to_vtbl( IID_IDirectDrawClipper ), (void**)lplpDDClipper );
 		}
 	}
 	EPILOGUE( hResult );
 }
-
 
 // do we care what the CLSID is ?? or do we just look at riid...
 // CLSID_DirectDraw, CLSID_DirectDraw7, CLSID_DirectDrawClipper
@@ -180,13 +177,12 @@ HRESULT __stdcall DllGetClassObject( REFCLSID rclsid, REFIID riid, LPVOID* ppvOb
 	{
 		hResult = pDllGetClassObject( rclsid, riid, ppvObject );
 		if( SUCCEEDED( hResult) )
-		{ 
+		{
 			Wrap( NULL, iid_to_vtbl( riid ), ppvObject );
 		}
 	}
 	EPILOGUE( hResult );
 }
-
 
 ////////////////////////////////////////////
 //
@@ -196,7 +192,7 @@ HRESULT __stdcall DllGetClassObject( REFCLSID rclsid, REFIID riid, LPVOID* ppvOb
 
 // returns void / no return value
 DWORD __stdcall AcquireDDThreadLock()
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pAcquireDDThreadLock != NULL )
@@ -220,9 +216,8 @@ DWORD __stdcall ReleaseDDThreadLock()
 	EPILOGUE( hResult );
 }
 
-
 HRESULT __stdcall DirectDrawEnumerateA( LPDDENUMCALLBACK lpCallback, LPVOID lpContext )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pDirectDrawEnumerateA != NULL )
@@ -232,33 +227,30 @@ HRESULT __stdcall DirectDrawEnumerateA( LPDDENUMCALLBACK lpCallback, LPVOID lpCo
 	EPILOGUE( hResult );
 }
 
-
 HRESULT __stdcall DirectDrawEnumerateExA( LPDDENUMCALLBACK lpCallback, LPVOID lpContext, DWORD dwFlags )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
-	if( pDirectDrawEnumerateExA != NULL ) 
+	if( pDirectDrawEnumerateExA != NULL )
 	{
 		hResult = pDirectDrawEnumerateExA( lpCallback, lpContext, dwFlags );
 	}
 	EPILOGUE( hResult );
 }
 
-
 HRESULT __stdcall DirectDrawEnumerateExW( LPDDENUMCALLBACK lpCallback, LPVOID lpContext, DWORD dwFlags )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
-	if( pDirectDrawEnumerateExW != NULL ) 
+	if( pDirectDrawEnumerateExW != NULL )
 	{
 		hResult = pDirectDrawEnumerateExW( lpCallback, lpContext, dwFlags );
 	}
 	EPILOGUE( hResult );
 }
 
-
 HRESULT __stdcall DirectDrawEnumerateW( LPDDENUMCALLBACK lpCallback, LPVOID lpContext )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pDirectDrawEnumerateW != NULL )
@@ -268,9 +260,8 @@ HRESULT __stdcall DirectDrawEnumerateW( LPDDENUMCALLBACK lpCallback, LPVOID lpCo
 	EPILOGUE( hResult );
 }
 
-
 HRESULT __stdcall D3DParseUnknownCommand( LPVOID lpCmd, LPVOID *lpRetCmd )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = D3DERR_COMMAND_UNPARSED;
 	if( pD3DParseUnknownCommand != NULL )
@@ -280,9 +271,8 @@ HRESULT __stdcall D3DParseUnknownCommand( LPVOID lpCmd, LPVOID *lpRetCmd )
 	EPILOGUE( hResult );
 }
 
-
 HRESULT __stdcall DllCanUnloadNow()
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = S_FALSE;
 	if( pDllCanUnloadNow != NULL )
@@ -292,10 +282,9 @@ HRESULT __stdcall DllCanUnloadNow()
 	EPILOGUE( hResult );
 }
 
-
 DWORD __stdcall GetOLEThunkData( DWORD index )
-{ 
-	//	switch( index ) 
+{
+	//	switch( index )
 	//	{
 	//		case 1: return _dwLastFrameRate;
 	//		case 2: return _lpDriverObjectList;
@@ -313,10 +302,9 @@ DWORD __stdcall GetOLEThunkData( DWORD index )
 	EPILOGUE( dwResult );
 }
 
-
 DWORD __stdcall SetAppCompatData( DWORD index, DWORD data )
 {
-	//	switch( index ) 
+	//	switch( index )
 	//	{
 	//		case 1: _g_bDWMOffForPrimaryLock	= 0;	return 0;
 	//		case 2: _g_bDWMOffForPrimaryBlt		= 0;	return 0;
@@ -327,16 +315,15 @@ DWORD __stdcall SetAppCompatData( DWORD index, DWORD data )
 	//	}
 	PROLOGUE;
 	DWORD dwResult = 0;
-	if( pSetAppCompatData != NULL ) 
+	if( pSetAppCompatData != NULL )
 	{
 		dwResult = pSetAppCompatData( index, data );
 	}
 	EPILOGUE( dwResult );
 }
 
-
 DWORD __stdcall CompleteCreateSysmemSurface( DWORD arg1 )
-{ 
+{
 	PROLOGUE;
 	DWORD dwResult = 0;
 	if( pCompleteCreateSysmemSurface != NULL )
@@ -346,9 +333,8 @@ DWORD __stdcall CompleteCreateSysmemSurface( DWORD arg1 )
 	EPILOGUE( dwResult );
 }
 
-
 HRESULT __stdcall DDGetAttachedSurfaceLcl( DWORD arg1, DWORD arg2, DWORD arg3 )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pDDGetAttachedSurfaceLcl != NULL )
@@ -358,9 +344,8 @@ HRESULT __stdcall DDGetAttachedSurfaceLcl( DWORD arg1, DWORD arg2, DWORD arg3 )
 	EPILOGUE( hResult );
 }
 
-
 DWORD __stdcall DDInternalLock( DWORD arg1, DWORD arg2 )
-{ 
+{
 	PROLOGUE;
 	DWORD dwResult = 0xFFFFFFFF;
 	if( pDDInternalLock != NULL )
@@ -369,7 +354,6 @@ DWORD __stdcall DDInternalLock( DWORD arg1, DWORD arg2 )
 	}
 	EPILOGUE( dwResult );
 }
-
 
 DWORD __stdcall DDInternalUnlock( DWORD arg1 )
 {
@@ -380,16 +364,16 @@ DWORD __stdcall DDInternalUnlock( DWORD arg1 )
 		dwResult = pDDInternalUnlock( arg1 );
 	}
 	EPILOGUE( dwResult );
-} 
+}
 
 /*
-   If SetCooperativeLevel is called once in a process, a binding is established between the process and the window. 
-   If it is called again in the same process with a different non-null window handle, it returns the DDERR_HWNDALREADYSET 
+   If SetCooperativeLevel is called once in a process, a binding is established between the process and the window.
+   If it is called again in the same process with a different non-null window handle, it returns the DDERR_HWNDALREADYSET
    error value. Some applications may receive this error value when DirectSound(R) specifies a different window handle than
    DirectDraw(R)—they should specify the same, top-level application window handle.
    */
 HRESULT __stdcall DSoundHelp( DWORD arg1, DWORD arg2, DWORD arg3 )
-{ 
+{
 	// _internalSetAppHWnd( 0, arg1, 0, 0, arg2, arg3 );
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
@@ -398,12 +382,11 @@ HRESULT __stdcall DSoundHelp( DWORD arg1, DWORD arg2, DWORD arg3 )
 		hResult = pDSoundHelp( arg1, arg2, arg3 );
 	}
 	EPILOGUE( hResult );
-} 
-
+}
 
 // assume HRESULT...
 HRESULT __stdcall GetDDSurfaceLocal(  DWORD arg1, DWORD arg2, DWORD arg3 )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pGetDDSurfaceLocal != NULL )
@@ -415,7 +398,7 @@ HRESULT __stdcall GetDDSurfaceLocal(  DWORD arg1, DWORD arg2, DWORD arg3 )
 
 // assume HRESULT...
 HRESULT __stdcall GetSurfaceFromDC_export(  DWORD arg1, DWORD arg2, DWORD arg3 )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pGetSurfaceFromDC != NULL )
@@ -423,12 +406,11 @@ HRESULT __stdcall GetSurfaceFromDC_export(  DWORD arg1, DWORD arg2, DWORD arg3 )
 		hResult = pGetSurfaceFromDC( arg1, arg2, arg3 );
 	}
 	EPILOGUE( hResult );
-} 
-
+}
 
 // setup for HEL BLT ???
 HRESULT __stdcall RegisterSpecialCase( DWORD arg1, DWORD arg2, DWORD arg3, DWORD arg4 )
-{ 
+{
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pRegisterSpecialCase != NULL )

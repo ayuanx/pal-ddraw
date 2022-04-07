@@ -4,7 +4,6 @@
 DEFINE_GUID( _IID_IDDVideoPortContainer, 0x6C142760,0xA733,0x11CE,0xA5,0x21,0x00,0x20,0xAF,0x0B,0xE5,0x60 );
 DEFINE_GUID( _IID_IDirectDrawVideoPort, 0xB36D93E0,0x2B43,0x11CF,0xA2,0xDE,0x00,0xAA,0x00,0xB9,0x33,0x56 );
 DEFINE_GUID( _IID_IDirectDrawVideoPortNotify, 0xA655FB94,0x0589,0x4E57,0xB3,0x33,0x56,0x7A,0x89,0x46,0x8C,0x88);
- 
 
 HANDLE file = INVALID_HANDLE_VALUE; 
 CRITICAL_SECTION log_lock;
@@ -25,8 +24,8 @@ void __cdecl Log( const char* fmt, ... )
 		if( file == INVALID_HANDLE_VALUE )
 		{
 			file = CreateFile("ddraw.log", GENERIC_WRITE, 
-				FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
-			);
+					FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
+					);
 			LeaveCriticalSection(&log_lock);
 			if( file == INVALID_HANDLE_VALUE ){ return; }
 		}
@@ -35,14 +34,14 @@ void __cdecl Log( const char* fmt, ... )
 	EnterCriticalSection(&log_lock);
 
 	va_list args;
-    va_start(args,fmt);
-    len = wvsprintf( buf, fmt, args );
+	va_start(args,fmt);
+	len = wvsprintf( buf, fmt, args );
 	va_end(args);
 
 	ol.Offset = pos;
 	ol.OffsetHigh = 0; 
 	ol.hEvent = NULL;
-	
+
 	if( WriteFile(file, buf, len, &bytes_written,  &ol) )
 	{
 		pos += bytes_written;
@@ -54,7 +53,6 @@ void __cdecl Log( const char* fmt, ... )
 	LeaveCriticalSection(&log_lock);
 }
 
-
 void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName )
 {
 	BITMAPFILEHEADER bmfh;
@@ -63,8 +61,8 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName )
 	OVERLAPPED ol;
 
 	DDSURFACEDESC ddsd;
-    ddsd.dwSize = sizeof( ddsd );
-    if( FAILED( pDDSurface->lpVtbl->Lock( pDDSurface, NULL, &ddsd, DDLOCK_WAIT, NULL) ) ) return;
+	ddsd.dwSize = sizeof( ddsd );
+	if( FAILED( pDDSurface->lpVtbl->Lock( pDDSurface, NULL, &ddsd, DDLOCK_WAIT, NULL) ) ) return;
 
 	bmfh.bfType =  0x4d42; // "BM"  
 	bmfh.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFO) + ( ddsd.dwWidth * ddsd.dwHeight * 4 ); // 4 bytes per pixel
@@ -80,7 +78,7 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName )
 	bmi.bmiHeader.biPlanes = 1;
 	bmi.bmiHeader.biBitCount = 32;
 	bmi.bmiHeader.biCompression = BI_RGB;
-	
+
 	hFile = CreateFile( szFileName, GENERIC_WRITE, 0, NULL, CREATE_NEW, FILE_ATTRIBUTE_NORMAL, 0);
 	if( hFile != NULL )
 	{
@@ -98,10 +96,9 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName )
 		}
 		CloseHandle(hFile);
 	}
-	
+
 	pDDSurface->lpVtbl->Unlock( pDDSurface, NULL );
 }
-
 
 void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 {
@@ -213,7 +210,6 @@ void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 		Log( " }\n" );
 	}
 }
- 
 
 void LogGUID(const GUID& riid)
 {
@@ -232,7 +228,7 @@ void LogGUID(const GUID& riid)
 	else if ( riid == IID_IDirectDrawPalette         ) Log( "IID_IDirectDrawPalette\n"         );
 	else if ( riid == IID_IDirectDrawColorControl    ) Log( "IID_IDirectDrawColorControl\n"    );
 	else if ( riid == IID_IDirectDrawGammaControl    ) Log( "IID_IDirectDrawGammaControl\n"    );
-	
+
 	// unsupported //
 	else if ( riid == _IID_IDDVideoPortContainer      ) Log( "IID_IDDVideoPortContainer\n"      );
 	else if ( riid == _IID_IDirectDrawVideoPort       ) Log( "IID_IDirectDrawVideoPort\n"       );
@@ -267,10 +263,9 @@ void LogGUID(const GUID& riid)
 	else 
 	{
 		Log( ">>>> Unknown GUID: 0x%08X,0x%04X,0x%04X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X,0x%02X <<<<\n",
-			riid.Data1, riid.Data2, riid.Data3, riid.Data4[0], riid.Data4[1], riid.Data4[2], riid.Data4[3], riid.Data4[4],
-			riid.Data4[5], riid.Data4[6], riid.Data4[7]
-		);
+				riid.Data1, riid.Data2, riid.Data3, riid.Data4[0], riid.Data4[1], riid.Data4[2], riid.Data4[3], riid.Data4[4],
+				riid.Data4[5], riid.Data4[6], riid.Data4[7]
+		   );
 	}
 }
-
 

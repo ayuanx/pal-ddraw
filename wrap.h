@@ -1,13 +1,11 @@
-#pragma once
-
 // when a dd object is destroyed all children are also destroyed ( surfaces, etc. )
 // we've got no good way to known if an dd obj is destroyed
-// a dd obj is destroyed when it has no active interfaces... 
+// a dd obj is destroyed when it has no active interfaces...
 // a dd object can have many interfaces at once... IDirectDraw, IDirectDraw2, IDirectDraw4, IDirectDraw7 and IUnknown
 struct DD_LIFETIME
 {
 	IUnknown* obj;
-	unsigned long iface_cnt; 
+	unsigned long iface_cnt;
 	DD_LIFETIME* next;
 };
 
@@ -37,7 +35,6 @@ struct WRAP
 	WRAP* next; // for use in unordered hash map
 };
 
-
 struct EnumStruct
 {
 	const void* xVtbl;
@@ -50,16 +47,15 @@ struct EnumStruct
 extern CRITICAL_SECTION cs;
 extern SYSTEM_INFO sSysInfo;
 
-bool Wrap( DD_LIFETIME* dd_parent, const void* xVtbl, void** ppvInterface );
 const void* dd_to_dds_vtbl( WRAP* This );
 const void* dds_to_dd_vtbl( WRAP* This );
 const void* iid_to_vtbl( const GUID& riid );
+bool Wrap( DD_LIFETIME* dd_parent, const void* xVtbl, void** ppvInterface );
 ULONG WrapRelease( WRAP* This );
 HRESULT __stdcall WrapEnumSurfacesCallback( LPDIRECTDRAWSURFACE lpDDSurface, LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext );
-//
+
 IDirectDraw*        GetInnerInterface( IDirectDraw* iface );
 IDirectDrawSurface* GetInnerInterface( IDirectDrawSurface* iface );
 IDirectDrawClipper* GetInnerInterface( IDirectDrawClipper* iface );
 IDirectDrawPalette* GetInnerInterface( IDirectDrawPalette* iface );
-
 
