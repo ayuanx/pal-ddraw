@@ -105,6 +105,7 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 					*last = '\0';
 					strcat(last, ".ini");
 					dx::NoFlip = GetPrivateProfileInt("PAL-DDRAW", "NoFlip", 0, szPath);
+					dx::NoBuffer = GetPrivateProfileInt("PAL-DDRAW", "NoBuffer", 0, szPath);
 					dx::NoThrottle = GetPrivateProfileInt("PAL-DDRAW", "NoThrottle", 0, szPath);
 				}
 				break;

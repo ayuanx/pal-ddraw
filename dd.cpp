@@ -118,6 +118,15 @@ namespace dd
 					}
 					INFO("realFront: %08X, realBack: %08X\n", dx::real[0], dx::real[1]);
 
+					if (!dx::NoBuffer) {
+						lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS;
+						lpDDSurfaceDesc->dwHeight = dx::height;
+						lpDDSurfaceDesc->dwWidth = dx::width;
+						lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
+						hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::buffer, pUnkOuter);
+						INFO("buffer: %08X\n", dx::buffer);
+					}
+
 					lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS | DDSD_PIXELFORMAT;
 					lpDDSurfaceDesc->dwHeight = dx::height;
 					lpDDSurfaceDesc->dwWidth = dx::width;
