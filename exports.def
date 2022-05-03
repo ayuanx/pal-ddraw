@@ -2,6 +2,6 @@ LIBRARY	"DDRAW"
 
 EXPORTS
 	DirectDrawCreate
-	DirectDrawCreateClipper
 	DirectDrawCreateEx
+	DirectDrawCreateClipper
 	DirectDrawEnumerateA

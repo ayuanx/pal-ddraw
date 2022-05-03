@@ -99,7 +99,7 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 					}
 				}
 
-				GetModuleFileName(hDll, szPath, MAX_PATH - 4);
+				GetModuleFileName(hDll, szPath, MAX_PATH);
 				char *last = strrchr(szPath, '.');
 				if (last) {
 					*last = '\0';
