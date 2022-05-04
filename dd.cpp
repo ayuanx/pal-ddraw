@@ -148,7 +148,8 @@ namespace dd
 				lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
 				lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = DDPF_RGB | DDPF_PALETTEINDEXED8;
 				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;
-				hResult = This->dd1->lpVtbl->CreateSurface( This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter );
+				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter);
+				if (SUCCEEDED(hResult) && dx::palette) (*lplpDDSurface)->lpVtbl->SetPalette(*lplpDDSurface, dx::palette);
 				INFO("CreateSurface %08X\n", *lplpDDSurface);
 			}
 		} else {
