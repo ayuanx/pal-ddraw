@@ -46,6 +46,10 @@ Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, th
 
 # Revisions:
 
+v.2022.11.19:
+- Proper handling of DDERR_SURFACELOST.
+- Change throttle to 60 FPS.
+
 v.2022.05.07:
 - Various compatibility fix.
 

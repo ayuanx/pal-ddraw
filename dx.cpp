@@ -22,27 +22,33 @@ namespace dx
 	}
 
 	HRESULT Flush(LPDIRECTDRAWSURFACE fk, DWORD to, DWORD dwFlags) {
-		HRESULT hResult;
+		HRESULT hResult = DD_OK;
 		DWORD now = 0;
 
-		if (!NoThrottle && to == 0) { // Palette is capped at 30 FPS (30ms)
+		if (!NoThrottle && to == 0) { // Palette is capped at 60 FPS (16ms)
 			now = GetTickCount(); 
-			if (now - time < 30) { WARN("DROP"); Sleep(0); return DDERR_WASSTILLDRAWING; }
+			if (now - time < 16) { WARN("DROP"); /* Sleep(0); */ return DDERR_WASSTILLDRAWING; }
 			time = now;
 		}
 
 		while (fk->lpVtbl->GetBltStatus(fk, DDGBS_ISBLTDONE) != DD_OK) Sleep(0);
-		HDC src, dest;
+		HDC src, dest = NULL;
 		fk->lpVtbl->GetDC(fk, &src);
 		if (!NoBuffer) {
 			buffer->lpVtbl->GetDC(buffer, &dest);
 		} else {
-			while ((hResult = real[caps]->lpVtbl->GetDC(real[caps], &dest)) == DDERR_SURFACELOST) real[caps]->lpVtbl->Restore(real[caps]);
+			if ((hResult = real[caps]->lpVtbl->GetDC(real[caps], &dest)) == DDERR_SURFACELOST) {
+			       real[0]->lpVtbl->Restore(real[0]); // Restore() should only be called on primary surface
+			       hResult = real[caps]->lpVtbl->GetDC(real[caps], &dest);
+			}
 		}
-		BitBlt(dest, 0, 0, width, height, src, 0, 0, SRCCOPY);
+		if (SUCCEEDED(hResult)) BitBlt(dest, 0, 0, width, height, src, 0, 0, SRCCOPY);
 		if (!NoBuffer) {
 			buffer->lpVtbl->ReleaseDC(buffer, dest);
-			while ((hResult = real[caps]->lpVtbl->BltFast(real[caps], 0, 0, buffer, NULL, DDBLTFAST_NOCOLORKEY)) == DDERR_SURFACELOST) real[caps]->lpVtbl->Restore(real[caps]);
+			if ((hResult = real[caps]->lpVtbl->BltFast(real[caps], 0, 0, buffer, NULL, DDBLTFAST_NOCOLORKEY)) == DDERR_SURFACELOST) {
+			       real[0]->lpVtbl->Restore(real[0]); // Restore() should only be called on primary surface
+			       hResult = real[caps]->lpVtbl->BltFast(real[caps], 0, 0, buffer, NULL, DDBLTFAST_NOCOLORKEY);
+			}
 		} else {
 			real[caps]->lpVtbl->ReleaseDC(real[caps], dest);
 		}
