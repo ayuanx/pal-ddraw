@@ -333,6 +333,7 @@ namespace dds
 	HRESULT __stdcall IsLost( WRAP* This )
 	{
 		PROLOGUE;
+		HRESULT hResult = This->dds1->lpVtbl->IsLost(This->dds1);
 		EPILOGUE( hResult );
 	}
 
