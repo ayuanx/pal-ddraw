@@ -7,7 +7,7 @@ namespace dx
 	DWORD NoThrottle = 0;
 
 	DWORD enabled = 0;
-	DWORD caps = 0;
+	DWORD caps = 0; // Flip capability
 	DWORD write = 0;
 	DWORD flip = 0;
 	DWORD time = 0;

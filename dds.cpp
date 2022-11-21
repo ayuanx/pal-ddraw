@@ -374,15 +374,25 @@ namespace dds
 		PROLOGUE;
 		HRESULT hResult;
 		LPDIRECTDRAWCLIPPER old_clipper = NULL;
-		hResult = This->dds1->lpVtbl->GetClipper( This->dds1, &old_clipper );
-		if( SUCCEEDED( hResult ) )
-		{
-			Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawClipper ), (void**)&old_clipper );
+		lpDDClipper = GetInnerInterface(lpDDClipper);
+		if (SUCCEEDED(This->dds1->lpVtbl->GetClipper(This->dds1, &old_clipper))) {
+			Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
 		}
-		hResult = This->dds1->lpVtbl->SetClipper( This->dds1, GetInnerInterface( lpDDClipper ) );
-		if( old_clipper != NULL )
-		{
-			old_clipper->lpVtbl->Release( old_clipper );
+		hResult = This->dds1->lpVtbl->SetClipper(This->dds1, lpDDClipper);
+		INFO("SetClipper %08X to %08X\n", lpDDClipper, This->dds1);
+		if (old_clipper != NULL) {
+			old_clipper->lpVtbl->Release(old_clipper);
+			old_clipper = NULL;
+		}
+
+		if (dx::caps && This->dds1 == dx::fake[1]) { // Back (Clipper is not supposed to be set on Front with Flip)
+			if (SUCCEEDED(dx::fake[0]->lpVtbl->GetClipper(dx::fake[0], &old_clipper))) {
+				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
+			}
+			dx::fake[0]->lpVtbl->SetClipper(dx::fake[0], lpDDClipper);
+			if(old_clipper != NULL) {
+				old_clipper->lpVtbl->Release(old_clipper);
+			}
 		}
 		EPILOGUE( hResult );
 	}
@@ -392,8 +402,10 @@ namespace dds
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->SetColorKey( This->dds1, dwFlags, lpDDColorKey );
 		INFO("SetColorKey L:%08X H:%08X to %08X : %08X\n", lpDDColorKey->dwColorSpaceLowValue, lpDDColorKey->dwColorSpaceHighValue, This->dds1, dwFlags);
-		if (This->dds1 == dx::fake[0]) dx::fake[1]->lpVtbl->SetColorKey(dx::fake[1], dwFlags, lpDDColorKey);
-		else if (This->dds1 == dx::fake[1]) dx::fake[0]->lpVtbl->SetColorKey(dx::fake[0], dwFlags, lpDDColorKey);
+		if (dx::caps) {
+		       if (This->dds1 == dx::fake[0]) dx::fake[1]->lpVtbl->SetColorKey(dx::fake[1], dwFlags, lpDDColorKey);
+		       else if (This->dds1 == dx::fake[1]) dx::fake[0]->lpVtbl->SetColorKey(dx::fake[0], dwFlags, lpDDColorKey);
+		}
 		EPILOGUE( hResult );
 	}
 
@@ -409,23 +421,26 @@ namespace dds
 		PROLOGUE;
 		HRESULT hResult;
 		LPDIRECTDRAWPALETTE old_palette = NULL;
-		hResult = This->dds1->lpVtbl->GetPalette( This->dds1, &old_palette );
-		if( SUCCEEDED( hResult ) )
-		{
-			Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawPalette ), (void**)&old_palette );
-		}
-
 		lpDDPalette = GetInnerInterface(lpDDPalette);
+		if (SUCCEEDED(This->dds1->lpVtbl->GetPalette(This->dds1, &old_palette))) {
+			Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawPalette), (void**)&old_palette);
+		}
 		hResult = This->dds1->lpVtbl->SetPalette(This->dds1, lpDDPalette);
 		INFO("SetPalette %08X to %08X\n", lpDDPalette, This->dds1);
-		if (This->dds1 == dx::fake[0]) { // Front
-			dx::fake[1]->lpVtbl->SetPalette(dx::fake[1], lpDDPalette);
-			dx::palette = lpDDPalette;
+		if(old_palette != NULL) {
+			old_palette->lpVtbl->Release(old_palette);
+			old_palette = NULL;
 		}
 
-		if( old_palette != NULL )
-		{
-			old_palette->lpVtbl->Release( old_palette );
+		if (This->dds1 == dx::fake[0]) { // Front
+			dx::palette = lpDDPalette;
+			if (SUCCEEDED(dx::fake[1]->lpVtbl->GetPalette(dx::fake[1], &old_palette))) {
+				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawPalette), (void**)&old_palette);
+			}
+			dx::fake[1]->lpVtbl->SetPalette(dx::fake[1], lpDDPalette);
+			if(old_palette != NULL) {
+				old_palette->lpVtbl->Release(old_palette);
+			}
 		}
 		EPILOGUE( hResult );
 	}

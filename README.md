@@ -46,7 +46,9 @@ Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, th
 
 # Revisions:
 
-v.2022.11.19:
+v.2022.11.21:
+- Support full screen clipper.
+- Proper release of palette.
 - Proper handling of DDERR_SURFACELOST.
 - Change throttle to 60 FPS.
 
