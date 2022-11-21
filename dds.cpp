@@ -251,7 +251,8 @@ namespace dds
 	HRESULT __stdcall GetBltStatus( WRAP* This, DWORD dwFlags )
 	{
 		PROLOGUE;
-		HRESULT hResult = This->dds1->lpVtbl->GetBltStatus( This->dds1, dwFlags );
+		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
+		HRESULT hResult = sf->lpVtbl->GetBltStatus(sf, dwFlags);
 		EPILOGUE( hResult );
 	}
 
@@ -332,8 +333,6 @@ namespace dds
 	HRESULT __stdcall IsLost( WRAP* This )
 	{
 		PROLOGUE;
-		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
-		HRESULT hResult = sf->lpVtbl->IsLost(sf);
 		EPILOGUE( hResult );
 	}
 
@@ -385,12 +384,15 @@ namespace dds
 			old_clipper = NULL;
 		}
 
-		if (dx::caps && This->dds1 == dx::fake[1]) { // Back (Clipper is not supposed to be set on Front with Flip)
-			if (SUCCEEDED(dx::fake[0]->lpVtbl->GetClipper(dx::fake[0], &old_clipper))) {
+		LPDIRECTDRAWSURFACE sf = NULL;
+		if (This->dds1 == dx::fake[0]) sf = dx::fake[1];
+		else if (This->dds1 == dx::fake[1]) sf = dx::fake[0];
+		if (sf) {
+			if (SUCCEEDED(sf->lpVtbl->GetClipper(sf, &old_clipper))) {
 				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
 			}
-			dx::fake[0]->lpVtbl->SetClipper(dx::fake[0], lpDDClipper);
-			if(old_clipper != NULL) {
+			sf->lpVtbl->SetClipper(sf, lpDDClipper);
+			if (old_clipper != NULL) {
 				old_clipper->lpVtbl->Release(old_clipper);
 			}
 		}
@@ -400,12 +402,10 @@ namespace dds
 	HRESULT __stdcall SetColorKey( WRAP* This, DWORD dwFlags, LPDDCOLORKEY lpDDColorKey )
 	{
 		PROLOGUE;
-		HRESULT hResult = This->dds1->lpVtbl->SetColorKey( This->dds1, dwFlags, lpDDColorKey );
+		HRESULT hResult = This->dds1->lpVtbl->SetColorKey(This->dds1, dwFlags, lpDDColorKey);
 		INFO("SetColorKey L:%08X H:%08X to %08X : %08X\n", lpDDColorKey->dwColorSpaceLowValue, lpDDColorKey->dwColorSpaceHighValue, This->dds1, dwFlags);
-		if (dx::caps) {
-		       if (This->dds1 == dx::fake[0]) dx::fake[1]->lpVtbl->SetColorKey(dx::fake[1], dwFlags, lpDDColorKey);
-		       else if (This->dds1 == dx::fake[1]) dx::fake[0]->lpVtbl->SetColorKey(dx::fake[0], dwFlags, lpDDColorKey);
-		}
+		if (This->dds1 == dx::fake[0]) dx::fake[1]->lpVtbl->SetColorKey(dx::fake[1], dwFlags, lpDDColorKey);
+		else if (This->dds1 == dx::fake[1]) dx::fake[0]->lpVtbl->SetColorKey(dx::fake[0], dwFlags, lpDDColorKey);
 		EPILOGUE( hResult );
 	}
 
@@ -432,7 +432,7 @@ namespace dds
 			old_palette = NULL;
 		}
 
-		if (This->dds1 == dx::fake[0]) { // Front
+		if (This->dds1 == dx::fake[0]) { // Front (System wide)
 			dx::palette = lpDDPalette;
 			if (SUCCEEDED(dx::fake[1]->lpVtbl->GetPalette(dx::fake[1], &old_palette))) {
 				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawPalette), (void**)&old_palette);
