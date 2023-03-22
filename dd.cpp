@@ -99,6 +99,7 @@ namespace dd
 	{
 		PROLOGUE;
 		HRESULT hResult;
+		INFO("CreateSurface %08X\n", lpDDSurfaceDesc->ddsCaps.dwCaps);
 		if (dx::enabled) {
 			if (lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) {
 				if (dx::caps) {
@@ -150,7 +151,7 @@ namespace dd
 				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = 8;
 				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter);
 				if (SUCCEEDED(hResult) && dx::palette) (*lplpDDSurface)->lpVtbl->SetPalette(*lplpDDSurface, dx::palette);
-				INFO("CreateSurface %08X\n", *lplpDDSurface);
+				INFO("offScreen %08X\n", *lplpDDSurface);
 			}
 		} else {
 			hResult = This->dd1->lpVtbl->CreateSurface( This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter );
@@ -267,6 +268,7 @@ namespace dd
 	HRESULT __stdcall SetCooperativeLevel( WRAP* This, HWND hWnd, DWORD dwFlags )
 	{ 		
 		PROLOGUE;
+		INFO("SetCooperativeLevel %08X\n", dwFlags);
 		if (dx::NoFlip) dx::caps = 0;
 		else {
 			DDCAPS ddcaps = {0};

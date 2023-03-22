@@ -47,7 +47,7 @@ void dds32_to_bmp( IDirectDrawSurface* pDDSurface, char* szFileName );
 #undef TRACE
 #undef WARN
 #undef INFO
-#define EPILOGUE(x) Log( "%08X %s\n", x, __FUNCTION__ ); return(x)
+#define EPILOGUE(x) Log( "< %08X %s\n", x, __FUNCTION__ ); return(x)
 #define LOG_GUID(x) LogGUID( x )
 #define PROLOGUE    Log( "> %08X %s\n", __builtin_return_address(0), __FUNCTION__ )
 #define TRACE(x)    Log( "TRACE: %s %s\n", __FUNCTION__, x )

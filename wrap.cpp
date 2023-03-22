@@ -183,7 +183,7 @@ ULONG WrapRelease( WRAP* This )
 				{
 					if( w->dd_parent == This->dd_parent ) // if match
 					{
-						TRACE( "destroyed child\n" );
+						TRACE( "destroyed child" );
 						// move to freelist
 						if( prev != NULL )
 						{

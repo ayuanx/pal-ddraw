@@ -36,7 +36,7 @@ Tip: If the game is not utilizing DirectDraw 8-bit (256 colors) palette mode, th
 
 * I know there are already several other DirectDraw wrappers, but they all forward the rendering to either Direct3D 8/9/10 or OpenGL2/Vulkan, which means they won't run on legacy OS like Win95/98/XP. My goal is support all legacy and modern OSes on both real machine and virtual machine.
 
-* Emulating DirectDraw palette by falling back to GDI inevitablly incurs some performance lost, but this should be negligible for old games whose native resolution is usually rather low like 640x480 or 800x600 and does not require a high refresh rate.
+* Emulating DirectDraw palette by falling back to GDI inevitablly incurs some performance loss, but this should be negligible for old games whose native resolution is usually rather low like 640x480 or 800x600 and does not require a high refresh rate.
 
 * Currently only full screen mode emulation is implemented. Window mode emulation may be implemented later. 
 
