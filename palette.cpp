@@ -63,9 +63,9 @@ namespace palette
 		INFO("SetEntries offset %d cnt %d\n", dwStartingEntry, dwCount);
 		if (SUCCEEDED(hResult) && (This->pal == dx::palette)) {
 			if (dx::enabled > 256) { // Palette is fully initialized.
-				dx::Flush(dx::fake[dx::flip]);
+				dx::Flush(dx::fake[dx::flip], 1);
 			} else {
-				if (dx::enabled == 1) dx::Flush(dx::fake[dx::flip]); // Initial draw.
+				if (dx::enabled == 1) dx::Flush(dx::fake[dx::flip], 1); // Initial draw.
 				dx::enabled += dwCount;
 			}
 		}

@@ -160,6 +160,7 @@ bool Wrap( DD_LIFETIME* dd_parent, const void* xVtbl, void** ppvInterface )
 ULONG WrapRelease( WRAP* This )
 {
 	TRACE( ">" );
+	if (This == NULL) return 0;
 	EnterCriticalSection( &cs );
 	ULONG dwCount = This->unknwn->lpVtbl->Release( This->unknwn );
 	if( dwCount == 0 )
@@ -239,10 +240,15 @@ ULONG WrapRelease( WRAP* This )
 HRESULT __stdcall WrapEnumSurfacesCallback( LPDIRECTDRAWSURFACE lpDDSurface, LPDDSURFACEDESC lpDDSurfaceDesc, LPVOID lpContext )
 {
 	PROLOGUE;
+	HRESULT hResult;
 	EnumStruct* e = (EnumStruct*)lpContext;
-	bool bNew = Wrap( e->dd_parent, e->xVtbl, (void**)&lpDDSurface );
-	if( ( bNew != false ) && ( e->must_exist != false ) ){ WARN( "interface was not wrapped" ); }
-	HRESULT hResult = ((LPDDENUMSURFACESCALLBACK) e->callback)( lpDDSurface, lpDDSurfaceDesc, e->context );
+	if (lpDDSurface == dx::real[0] || lpDDSurface == dx::real[1] || lpDDSurface == dx::buffer) {
+		hResult = DDENUMRET_OK; // hide our internal surfaces
+	} else {
+		bool bNew = Wrap( e->dd_parent, e->xVtbl, (void**)&lpDDSurface );
+		if (bNew && e->must_exist) { WARN( "interface was not wrapped" ); }
+		hResult = ((LPDDENUMSURFACESCALLBACK) e->callback)( lpDDSurface, lpDDSurfaceDesc, e->context );
+	}
 	EPILOGUE( hResult );
 }
 

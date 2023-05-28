@@ -104,9 +104,9 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 				if (last) {
 					*last = '\0';
 					strcat(last, ".ini");
-					dx::NoFlip = GetPrivateProfileInt("PAL-DDRAW", "NoFlip", 0, szPath);
 					dx::NoBuffer = GetPrivateProfileInt("PAL-DDRAW", "NoBuffer", 0, szPath);
-					dx::NoThrottle = GetPrivateProfileInt("PAL-DDRAW", "NoThrottle", 0, szPath);
+					dx::UseFlip = GetPrivateProfileInt("PAL-DDRAW", "UseFlip", 0, szPath);
+					dx::UseThrottle = GetPrivateProfileInt("PAL-DDRAW", "UseThrottle", 0, szPath);
 				}
 				break;
 			}
@@ -132,6 +132,7 @@ HRESULT __stdcall DirectDrawCreate( GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown
 	if( pDirectDrawCreate != NULL )
 	{
 		hResult = pDirectDrawCreate( lpGUID, lplpDD, pUnkOuter );
+		INFO("DirectDrawCreate GUID %08X -> DD %08X\n", lpGUID, *lplpDD);
 		if( SUCCEEDED( hResult) )
 		{
 			Wrap( NULL, iid_to_vtbl( IID_IDirectDraw ), (void**)lplpDD );
@@ -147,6 +148,7 @@ HRESULT __stdcall DirectDrawCreateEx( GUID* lpGUID, LPVOID* lplpDD, REFIID iid, 
 	if( pDirectDrawCreateEx != NULL )
 	{
 		hResult = pDirectDrawCreateEx( lpGUID, lplpDD, iid, pUnkOuter );
+		INFO("DirectDrawCreateEx GUID %08X -> DD %08X\n", lpGUID, *lplpDD);
 		if( SUCCEEDED( hResult) )
 		{
 			Wrap( NULL, iid_to_vtbl( iid ), (void**)lplpDD );
@@ -162,6 +164,7 @@ HRESULT __stdcall DirectDrawCreateClipper( DWORD dwFlags, LPDIRECTDRAWCLIPPER FA
 	if( pDirectDrawCreateClipper != NULL )
 	{
 		hResult = pDirectDrawCreateClipper( dwFlags, lplpDDClipper, pUnkOuter );
+		INFO("DirectDrawCreateClipper dwFlags %08X -> %08X\n", dwFlags, *lplpDDClipper);
 		if( SUCCEEDED( hResult) )
 		{
 			Wrap( NULL, iid_to_vtbl( IID_IDirectDrawClipper ), (void**)lplpDDClipper );

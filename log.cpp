@@ -213,21 +213,21 @@ void LogDDSD( LPDDSURFACEDESC lpDDSurfaceDesc )
 
 void LogGUID(const GUID& riid)
 {
-	if      ( riid == IID_IUnknown                   ) Log( "IID_IUnknown\n"                   );
-	else if ( riid == IID_IClassFactory              ) Log( "IID_IClassFactory\n"              );
-	else if ( riid == IID_IDirectDraw                ) Log( "IID_IDirectDraw\n"                );
-	else if	( riid == IID_IDirectDraw2               ) Log( "IID_IDirectDraw2\n"               );
-	else if	( riid == IID_IDirectDraw4               ) Log( "IID_IDirectDraw4\n"               );
-	else if	( riid == IID_IDirectDraw7               ) Log( "IID_IDirectDraw7\n"               );
-	else if ( riid == IID_IDirectDrawSurface         ) Log( "IID_IDirectDrawSurface\n"         );
-	else if ( riid == IID_IDirectDrawSurface2        ) Log( "IID_IDirectDrawSurface2\n"        ); 
-	else if ( riid == IID_IDirectDrawSurface3        ) Log( "IID_IDirectDrawSurface3\n"        );
-	else if ( riid == IID_IDirectDrawSurface4        ) Log( "IID_IDirectDrawSurface4\n"        );
-	else if ( riid == IID_IDirectDrawSurface7        ) Log( "IID_IDirectDrawSurface7\n"        );
-	else if ( riid == IID_IDirectDrawClipper         ) Log( "IID_IDirectDrawClipper\n"         );
-	else if ( riid == IID_IDirectDrawPalette         ) Log( "IID_IDirectDrawPalette\n"         );
-	else if ( riid == IID_IDirectDrawColorControl    ) Log( "IID_IDirectDrawColorControl\n"    );
-	else if ( riid == IID_IDirectDrawGammaControl    ) Log( "IID_IDirectDrawGammaControl\n"    );
+	if      ( riid == IID_IUnknown                   ) Log( "  IID_IUnknown\n"                   );
+	else if ( riid == IID_IClassFactory              ) Log( "  IID_IClassFactory\n"              );
+	else if ( riid == IID_IDirectDraw                ) Log( "  IID_IDirectDraw\n"                );
+	else if	( riid == IID_IDirectDraw2               ) Log( "  IID_IDirectDraw2\n"               );
+	else if	( riid == IID_IDirectDraw4               ) Log( "  IID_IDirectDraw4\n"               );
+	else if	( riid == IID_IDirectDraw7               ) Log( "  IID_IDirectDraw7\n"               );
+	else if ( riid == IID_IDirectDrawSurface         ) Log( "  IID_IDirectDrawSurface\n"         );
+	else if ( riid == IID_IDirectDrawSurface2        ) Log( "  IID_IDirectDrawSurface2\n"        ); 
+	else if ( riid == IID_IDirectDrawSurface3        ) Log( "  IID_IDirectDrawSurface3\n"        );
+	else if ( riid == IID_IDirectDrawSurface4        ) Log( "  IID_IDirectDrawSurface4\n"        );
+	else if ( riid == IID_IDirectDrawSurface7        ) Log( "  IID_IDirectDrawSurface7\n"        );
+	else if ( riid == IID_IDirectDrawClipper         ) Log( "  IID_IDirectDrawClipper\n"         );
+	else if ( riid == IID_IDirectDrawPalette         ) Log( "  IID_IDirectDrawPalette\n"         );
+	else if ( riid == IID_IDirectDrawColorControl    ) Log( "  IID_IDirectDrawColorControl\n"    );
+	else if ( riid == IID_IDirectDrawGammaControl    ) Log( "  IID_IDirectDrawGammaControl\n"    );
 
 	// unsupported //
 	else if ( riid == _IID_IDDVideoPortContainer      ) Log( "IID_IDDVideoPortContainer\n"      );
