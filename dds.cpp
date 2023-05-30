@@ -355,6 +355,7 @@ namespace dds
 		} else {
 			hResult = This->dds1->lpVtbl->IsLost(This->dds1);
 		}
+		INFO("IsLost %08X\n", This->dds1);
 		EPILOGUE( hResult );
 	}
 
@@ -363,7 +364,7 @@ namespace dds
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->Lock(sf, lpDestRect, lpDDSurfaceDesc, dwFlags, hEvent);
-		INFO("Lock %08X (%08X) : %08X\n", This->dds1, sf, dwFlags);
+		INFO("Lock %08X (%08X) dwFlags %08X\n", This->dds1, sf, dwFlags);
 		if (SUCCEEDED(hResult) && !(dwFlags & DDLOCK_READONLY)) dx::write = 1;
 		EPILOGUE( hResult );
 	}
