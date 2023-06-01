@@ -238,7 +238,7 @@ namespace dds
 		PROLOGUE;
 		HRESULT hResult;
 		if (dx::enabled) {
-			INFO("Flip to fake %d : %08X\n", !dx::flip, dwFlags);
+			INFO("Flip to fake %d dwFlags %08X\n", !dx::flip, dwFlags);
 			hResult = dx::Flush(dx::fake[!dx::flip], 0, dwFlags); // Back
 			if (SUCCEEDED(hResult)) dx::flip = !dx::flip;
 		} else {
