@@ -38,7 +38,7 @@ Tip: If the game does not utilize DirectDraw at all, or if the game already supp
 
 * I know there are already several other DirectDraw wrappers, but they all forward the rendering to either Direct3D 8/9/10 or OpenGL2/Vulkan, which means they won't run on legacy OS like Win95/98/XP. My goal is support all legacy and modern OSes on both real machines and virtual machines.
 
-* Emulating DirectDraw color depth by falling back to GDI inevitablly incurs some performance loss, but this should be negligible for old games whose native resolution is usually rather low like 640x480 or 800x600 and does not require a high refresh rate.
+* Emulating DirectDraw color depth by falling back to GDI inevitablly incurs some performance loss, but this is generally negligible for old games whose native resolution is usually rather low like 640x480, 800x600, or 1024x768.
 
 * Currently only full screen mode emulation is implemented. Window mode emulation may be implemented later. 
 
@@ -47,6 +47,9 @@ Tip: If the game does not utilize DirectDraw at all, or if the game already supp
 - Use MinGW-w64 x86 (32-bit) to build on Windows OS.
 
 # Revisions:
+
+v.2023.08.04
+- Export DirectDrawEnumerateExA.
 
 v.2023.06.01
 - Extend the color depth emulation from 8-bit to 8-bit/16-bit/24-bit/32-bit.
