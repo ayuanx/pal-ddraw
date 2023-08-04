@@ -7,9 +7,9 @@ typedef HRESULT (__stdcall* DirectDrawCreate_t        )( GUID*, LPDIRECTDRAW*, I
 typedef HRESULT (__stdcall* DirectDrawCreateEx_t      )( GUID*, LPVOID*, REFIID, IUnknown* );
 typedef HRESULT (__stdcall* DirectDrawCreateClipper_t )( DWORD dwFlags, LPDIRECTDRAWCLIPPER FAR *lplpDDClipper,  IUnknown FAR *pUnkOuter );
 typedef HRESULT (__stdcall* DirectDrawEnumerateA_t    )( LPDDENUMCALLBACK lpCallback, LPVOID lpContext );
-typedef HRESULT (__stdcall* DirectDrawEnumerateExA_t  )( LPDDENUMCALLBACK lpCallback, LPVOID lpContext, DWORD dwFlags );
-typedef HRESULT (__stdcall* DirectDrawEnumerateExW_t  )( LPDDENUMCALLBACK lpCallback, LPVOID lpContext, DWORD dwFlags );
 typedef HRESULT (__stdcall* DirectDrawEnumerateW_t    )( LPDDENUMCALLBACK lpCallback, LPVOID lpContext );
+typedef HRESULT (__stdcall* DirectDrawEnumerateExA_t  )( LPDDENUMCALLBACKEX lpCallback, LPVOID lpContext, DWORD dwFlags );
+typedef HRESULT (__stdcall* DirectDrawEnumerateExW_t  )( LPDDENUMCALLBACKEX lpCallback, LPVOID lpContext, DWORD dwFlags );
 typedef HRESULT (__stdcall* D3DParseUnknownCommand_t  )( LPVOID lpCmd, LPVOID *lpRetCmd );
 typedef HRESULT (__stdcall* DllCanUnloadNow_t)();
 //
@@ -78,7 +78,7 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 						pDirectDrawCreateEx				= (DirectDrawCreateEx_t)			GetProcAddress( hRealDDraw, "DirectDrawCreateEx");
 						pDirectDrawCreateClipper		= (DirectDrawCreateClipper_t)		GetProcAddress( hRealDDraw, "DirectDrawCreateClipper");
 						pDirectDrawEnumerateA			= (DirectDrawEnumerateA_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateA");
-						//pDirectDrawEnumerateExA			= (DirectDrawEnumerateExA_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExA");
+						pDirectDrawEnumerateExA			= (DirectDrawEnumerateExA_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExA");
 						//pDirectDrawEnumerateExW			= (DirectDrawEnumerateExW_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExW");
 						//pDirectDrawEnumerateW			= (DirectDrawEnumerateW_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateW");
 						//pD3DParseUnknownCommand			= (D3DParseUnknownCommand_t)		GetProcAddress( hRealDDraw, "D3DParseUnknownCommand");
@@ -102,8 +102,7 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 				GetModuleFileName(hDll, szPath, MAX_PATH);
 				char *last = strrchr(szPath, '.');
 				if (last) {
-					*last = '\0';
-					strcat(last, ".ini");
+					strcpy(last, ".ini");
 					dx::NoBuffer = GetPrivateProfileInt("PAL-DDRAW", "NoBuffer", 0, szPath);
 					dx::UseFlip = GetPrivateProfileInt("PAL-DDRAW", "UseFlip", 0, szPath);
 					dx::UseThrottle = GetPrivateProfileInt("PAL-DDRAW", "UseThrottle", 0, szPath);
@@ -124,7 +123,6 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 	EPILOGUE( TRUE );
 }
 
-typedef HRESULT (__stdcall* DirectDrawCreate_t)( GUID*, LPDIRECTDRAW*, IUnknown* );
 HRESULT __stdcall DirectDrawCreate( GUID* lpGUID, LPDIRECTDRAW* lplpDD, IUnknown* pUnkOuter )
 {
 	PROLOGUE;
@@ -233,7 +231,18 @@ HRESULT __stdcall DirectDrawEnumerateA( LPDDENUMCALLBACK lpCallback, LPVOID lpCo
 	EPILOGUE( hResult );
 }
 
-HRESULT __stdcall DirectDrawEnumerateExA( LPDDENUMCALLBACK lpCallback, LPVOID lpContext, DWORD dwFlags )
+HRESULT __stdcall DirectDrawEnumerateW( LPDDENUMCALLBACK lpCallback, LPVOID lpContext )
+{
+	PROLOGUE;
+	HRESULT hResult = E_NOTIMPL;
+	if( pDirectDrawEnumerateW != NULL )
+	{
+		hResult = pDirectDrawEnumerateW( lpCallback, lpContext );
+	}
+	EPILOGUE( hResult );
+}
+
+HRESULT __stdcall DirectDrawEnumerateExA( LPDDENUMCALLBACKEX lpCallback, LPVOID lpContext, DWORD dwFlags )
 {
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
@@ -244,24 +253,13 @@ HRESULT __stdcall DirectDrawEnumerateExA( LPDDENUMCALLBACK lpCallback, LPVOID lp
 	EPILOGUE( hResult );
 }
 
-HRESULT __stdcall DirectDrawEnumerateExW( LPDDENUMCALLBACK lpCallback, LPVOID lpContext, DWORD dwFlags )
+HRESULT __stdcall DirectDrawEnumerateExW( LPDDENUMCALLBACKEX lpCallback, LPVOID lpContext, DWORD dwFlags )
 {
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pDirectDrawEnumerateExW != NULL )
 	{
 		hResult = pDirectDrawEnumerateExW( lpCallback, lpContext, dwFlags );
-	}
-	EPILOGUE( hResult );
-}
-
-HRESULT __stdcall DirectDrawEnumerateW( LPDDENUMCALLBACK lpCallback, LPVOID lpContext )
-{
-	PROLOGUE;
-	HRESULT hResult = E_NOTIMPL;
-	if( pDirectDrawEnumerateW != NULL )
-	{
-		hResult = pDirectDrawEnumerateW( lpCallback, lpContext );
 	}
 	EPILOGUE( hResult );
 }

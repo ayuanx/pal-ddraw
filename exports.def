@@ -1,7 +1,9 @@
-LIBRARY	"DDRAW"
+LIBRARY	"DDRAW.DLL"
 
 EXPORTS
 	DirectDrawCreate
 	DirectDrawCreateEx
 	DirectDrawCreateClipper
 	DirectDrawEnumerateA
+	DirectDrawEnumerateExA
+
