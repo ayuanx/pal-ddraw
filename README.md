@@ -48,6 +48,9 @@ Tip: If the game does not utilize DirectDraw at all, or if the game already supp
 
 # Revisions:
 
+v.2024.08.04
+- Compatibility fix for GetDisplayMode.
+
 v.2023.08.04
 - Export DirectDrawEnumerateExA.
 

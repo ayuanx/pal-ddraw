@@ -227,6 +227,16 @@ namespace dd
 	{
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetDisplayMode( This->dd1, lpDDSurfaceDesc );
+		if (dx::enabled && (lpDDSurfaceDesc->dwFlags & DDSD_PIXELFORMAT)) {
+			lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+			lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = dx::bpp == 8 ? DDPF_RGB | DDPF_PALETTEINDEXED8 : DDPF_RGB;
+			lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = dx::bpp;
+			lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0xF800 : 0xFF0000);
+			lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0x07E0 : 0x00FF00);
+			lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0x001F : 0x0000FF);
+			lpDDSurfaceDesc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
+		}
+		// TODO: May need to fix lPitch too.
 		INFO("GetDisplayMode %08X\n", This->dd1);
 		EPILOGUE( hResult );
 	}
