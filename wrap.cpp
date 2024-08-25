@@ -78,13 +78,14 @@ void* micro_alloc( int size )
 bool Wrap( DD_LIFETIME* dd_parent, const void* xVtbl, void** ppvInterface )
 {
 	TRACE( ">" );
-	WRAP* w = wrap_list;
 	bool bNew = false;
 
 	// validate args
 	if( ( xVtbl != NULL ) && ( ppvInterface != NULL ) && ( *ppvInterface != NULL ) )
 	{
 		EnterCriticalSection( &cs );
+		WRAP* w = wrap_list;
+
 		// search list
 		while( ( w != NULL ) && ( w->inner_iface != *ppvInterface ) ) w = w->next;	
 		if( w != NULL )
@@ -220,17 +221,14 @@ ULONG WrapRelease( WRAP* This )
 				}
 			}
 		}
-		else
+		// move This to the freelist
+		while( ( w != NULL ) && ( w != This ) ) prev = w, w = w->next; // find previons link
+		if( w != NULL )
 		{
-			// move This to the freelist
-			while( ( w != NULL ) && ( w != This ) ) prev = w, w = w->next; // find previons link
-			if( w != NULL )
-			{
-				if( prev != NULL ) prev->next = w->next;
-				else wrap_list = w->next;
-				w->next = wrap_freelist;
-				wrap_freelist = w;
-			}
+			if( prev != NULL ) prev->next = w->next;
+			else wrap_list = w->next;
+			w->next = wrap_freelist;
+			wrap_freelist = w;
 		}
 	}
 	LeaveCriticalSection( &cs );

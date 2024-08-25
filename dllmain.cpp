@@ -14,14 +14,14 @@ typedef HRESULT (__stdcall* D3DParseUnknownCommand_t  )( LPVOID lpCmd, LPVOID *l
 typedef HRESULT (__stdcall* DllCanUnloadNow_t)();
 //
 // undocumented
-typedef DWORD   (__stdcall* AcquireDDThreadLock_t         )();
-typedef DWORD   (__stdcall* ReleaseDDThreadLock_t         )();
+typedef HRESULT (__stdcall* AcquireDDThreadLock_t         )();
+typedef HRESULT (__stdcall* ReleaseDDThreadLock_t         )();
 typedef DWORD   (__stdcall* GetOLEThunkData_t             )( DWORD index );
 typedef DWORD   (__stdcall* SetAppCompatData_t            )( DWORD index, DWORD data );
 typedef DWORD   (__stdcall* CompleteCreateSysmemSurface_t )( DWORD );
 typedef HRESULT (__stdcall* DDGetAttachedSurfaceLcl_t     )( DWORD, DWORD, DWORD );
-typedef DWORD   (__stdcall* DDInternalLock_t              )( DWORD, DWORD );
-typedef DWORD   (__stdcall* DDInternalUnlock_t            )( DWORD );
+typedef HRESULT (__stdcall* DDInternalLock_t              )( DWORD, DWORD );
+typedef HRESULT (__stdcall* DDInternalUnlock_t            )( DWORD );
 typedef HRESULT (__stdcall* DSoundHelp_t                  )( DWORD, DWORD, DWORD );
 typedef HRESULT (__stdcall* GetDDSurfaceLocal_t           )( DWORD, DWORD, DWORD );
 typedef HRESULT (__stdcall* GetSurfaceFromDC_t            )( DWORD, DWORD, DWORD );
@@ -81,17 +81,17 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 						pDirectDrawEnumerateExA			= (DirectDrawEnumerateExA_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExA");
 						//pDirectDrawEnumerateExW			= (DirectDrawEnumerateExW_t)		GetProcAddress( hRealDDraw, "DirectDrawEnumerateExW");
 						//pDirectDrawEnumerateW			= (DirectDrawEnumerateW_t)			GetProcAddress( hRealDDraw, "DirectDrawEnumerateW");
-						//pD3DParseUnknownCommand			= (D3DParseUnknownCommand_t)		GetProcAddress( hRealDDraw, "D3DParseUnknownCommand");
+						pD3DParseUnknownCommand			= (D3DParseUnknownCommand_t)		GetProcAddress( hRealDDraw, "D3DParseUnknownCommand");
 						pDllGetClassObject				= (DllGetClassObject_t)				GetProcAddress( hRealDDraw, "DllGetClassObject");
 						pDllCanUnloadNow				= (DllCanUnloadNow_t)				GetProcAddress( hRealDDraw, "DllCanUnloadNow");
-						//pAcquireDDThreadLock			= (AcquireDDThreadLock_t)			GetProcAddress( hRealDDraw, "AcquireDDThreadLock");
-						//pReleaseDDThreadLock			= (ReleaseDDThreadLock_t)			GetProcAddress( hRealDDraw, "ReleaseDDThreadLock");
+						pAcquireDDThreadLock			= (AcquireDDThreadLock_t)			GetProcAddress( hRealDDraw, "AcquireDDThreadLock");
+						pReleaseDDThreadLock			= (ReleaseDDThreadLock_t)			GetProcAddress( hRealDDraw, "ReleaseDDThreadLock");
 						//pGetOLEThunkData				= (GetOLEThunkData_t)				GetProcAddress( hRealDDraw, "GetOLEThunkData");
 						//pSetAppCompatData				= (SetAppCompatData_t)				GetProcAddress( hRealDDraw, "SetAppCompatData");
 						//pCompleteCreateSysmemSurface	= (CompleteCreateSysmemSurface_t)	GetProcAddress( hRealDDraw, "CompleteCreateSysmemSurface");
 						//pDDGetAttachedSurfaceLcl		= (DDGetAttachedSurfaceLcl_t)		GetProcAddress( hRealDDraw, "DDGetAttachedSurfaceLcl");
-						//pDDInternalLock					= (DDInternalLock_t)				GetProcAddress( hRealDDraw, "DDInternalLock");
-						//pDDInternalUnlock				= (DDInternalUnlock_t)				GetProcAddress( hRealDDraw, "DDInternalUnlock");
+						pDDInternalLock					= (DDInternalLock_t)				GetProcAddress( hRealDDraw, "DDInternalLock");
+						pDDInternalUnlock				= (DDInternalUnlock_t)				GetProcAddress( hRealDDraw, "DDInternalUnlock");
 						//pDSoundHelp						= (DSoundHelp_t)					GetProcAddress( hRealDDraw, "DSoundHelp" );
 						//pGetDDSurfaceLocal				= (GetDDSurfaceLocal_t)				GetProcAddress( hRealDDraw, "GetDDSurfaceLocal" );
 						//pGetSurfaceFromDC				= (GetSurfaceFromDC_t)				GetProcAddress( hRealDDraw, "GetSurfaceFromDC" );
@@ -195,28 +195,28 @@ HRESULT __stdcall DllGetClassObject( REFCLSID rclsid, REFIID riid, LPVOID* ppvOb
 ////////////////////////////////////////////
 
 // returns void / no return value
-DWORD __stdcall AcquireDDThreadLock()
+HRESULT __stdcall AcquireDDThreadLock()
 {
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pAcquireDDThreadLock != NULL )
 	{
-		pAcquireDDThreadLock();
-		hResult = DD_OK;
+		hResult = pAcquireDDThreadLock();
 	}
+	INFO("AcquireDDThreadLock() = %08X\n", hResult);
 	EPILOGUE( hResult );
 }
 
 // returns void / no return value
-DWORD __stdcall ReleaseDDThreadLock()
+HRESULT __stdcall ReleaseDDThreadLock()
 {	
 	PROLOGUE;
 	HRESULT hResult = E_NOTIMPL;
 	if( pReleaseDDThreadLock != NULL )
 	{
-		pReleaseDDThreadLock();
-		hResult = DD_OK;
+		hResult = pReleaseDDThreadLock();
 	}
+	INFO("ReleaseDDThreadLock() = %08X\n", hResult);
 	EPILOGUE( hResult );
 }
 
@@ -272,6 +272,7 @@ HRESULT __stdcall D3DParseUnknownCommand( LPVOID lpCmd, LPVOID *lpRetCmd )
 	{
 		hResult = pD3DParseUnknownCommand( lpCmd, lpRetCmd );
 	}
+	INFO("D3DParseUnknownCommand(%08X, %08X) = %08X\n", lpCmd, lpRetCmd, hResult);
 	EPILOGUE( hResult );
 }
 
@@ -348,26 +349,28 @@ HRESULT __stdcall DDGetAttachedSurfaceLcl( DWORD arg1, DWORD arg2, DWORD arg3 )
 	EPILOGUE( hResult );
 }
 
-DWORD __stdcall DDInternalLock( DWORD arg1, DWORD arg2 )
+HRESULT __stdcall DDInternalLock( DWORD arg1, DWORD arg2 )
 {
 	PROLOGUE;
-	DWORD dwResult = 0xFFFFFFFF;
+	HRESULT hResult = E_NOTIMPL;
 	if( pDDInternalLock != NULL )
 	{
-		dwResult = pDDInternalLock( arg1, arg2 );
+		hResult = pDDInternalLock( arg1, arg2 );
 	}
-	EPILOGUE( dwResult );
+	INFO("DDInternalLock(%08X, %08X) = %08X\n", arg1, arg2, hResult);
+	EPILOGUE( hResult );
 }
 
-DWORD __stdcall DDInternalUnlock( DWORD arg1 )
+HRESULT __stdcall DDInternalUnlock( DWORD arg1 )
 {
 	PROLOGUE;
-	DWORD dwResult = 0xFFFFFFFF;
+	HRESULT hResult = E_NOTIMPL;
 	if( pDDInternalUnlock != NULL )
 	{
-		dwResult = pDDInternalUnlock( arg1 );
+		hResult = pDDInternalUnlock( arg1 );
 	}
-	EPILOGUE( dwResult );
+	INFO("DDInternalUnlock(%08X) = %08X\n", arg1, hResult);
+	EPILOGUE( hResult );
 }
 
 /*

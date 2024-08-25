@@ -48,6 +48,10 @@ Tip: If the game does not utilize DirectDraw at all, or if the game already supp
 
 # Revisions:
 
+v.2024.08.25
+- Fix the crash when one DirectDraw interface is released but several other are still active. 
+- Improve compatibility for games that utilize undocumented DDThreadLock methods.
+
 v.2024.08.04
 - Compatibility fix for GetDisplayMode.
 

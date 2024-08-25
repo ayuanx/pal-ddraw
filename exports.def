@@ -7,3 +7,9 @@ EXPORTS
 	DirectDrawEnumerateA
 	DirectDrawEnumerateExA
 
+	AcquireDDThreadLock
+	ReleaseDDThreadLock
+	DDInternalLock
+	DDInternalUnlock
+	D3DParseUnknownCommand
+
