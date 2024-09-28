@@ -295,6 +295,8 @@ namespace dds
 	{
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
+		// Set palette for offScreen surface in case it doesn't have one.
+		if (dx::palette && sf != dx::fake[0] && sf != dx::fake[1]) { sf->lpVtbl->SetPalette(sf, dx::palette); }
 		HRESULT hResult = sf->lpVtbl->GetDC(sf, lphDC);
 		INFO("GetDC %08X (%08X)\n", This->dds1, sf);
 		EPILOGUE( hResult );
