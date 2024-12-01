@@ -88,7 +88,7 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 						pReleaseDDThreadLock			= (ReleaseDDThreadLock_t)			GetProcAddress( hRealDDraw, "ReleaseDDThreadLock");
 						//pGetOLEThunkData				= (GetOLEThunkData_t)				GetProcAddress( hRealDDraw, "GetOLEThunkData");
 						//pSetAppCompatData				= (SetAppCompatData_t)				GetProcAddress( hRealDDraw, "SetAppCompatData");
-						//pCompleteCreateSysmemSurface	= (CompleteCreateSysmemSurface_t)	GetProcAddress( hRealDDraw, "CompleteCreateSysmemSurface");
+						pCompleteCreateSysmemSurface	= (CompleteCreateSysmemSurface_t)	GetProcAddress( hRealDDraw, "CompleteCreateSysmemSurface");
 						//pDDGetAttachedSurfaceLcl		= (DDGetAttachedSurfaceLcl_t)		GetProcAddress( hRealDDraw, "DDGetAttachedSurfaceLcl");
 						pDDInternalLock					= (DDInternalLock_t)				GetProcAddress( hRealDDraw, "DDInternalLock");
 						pDDInternalUnlock				= (DDInternalUnlock_t)				GetProcAddress( hRealDDraw, "DDInternalUnlock");
@@ -106,6 +106,7 @@ BOOL WINAPI DllMain(HINSTANCE hDll, DWORD dwReason, LPVOID lpvReserved)
 					dx::NoBuffer = GetPrivateProfileInt("PAL-DDRAW", "NoBuffer", 0, szPath);
 					dx::UseFlip = GetPrivateProfileInt("PAL-DDRAW", "UseFlip", 0, szPath);
 					dx::UseThrottle = GetPrivateProfileInt("PAL-DDRAW", "UseThrottle", 0, szPath);
+					dx::bpp = GetPrivateProfileInt("PAL-DDRAW", "BPP", 0, szPath);
 				}
 				break;
 			}
@@ -327,7 +328,7 @@ DWORD __stdcall SetAppCompatData( DWORD index, DWORD data )
 	EPILOGUE( dwResult );
 }
 
-DWORD __stdcall CompleteCreateSysmemSurface( DWORD arg1 )
+HRESULT __stdcall CompleteCreateSysmemSurface( DWORD arg1 )
 {
 	PROLOGUE;
 	DWORD dwResult = 0;

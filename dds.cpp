@@ -86,17 +86,17 @@ namespace dds
 		ULONG dwCount = WrapRelease(This);
 		INFO("Release DDS %08X dwCount %08X\n", This->dds1, dwCount);
 		if (!dwCount) {
-			if (This->dds1 == dx::fake[0]) { // Release real surfaces when the fake primary is released.
-				if (dx::fake[1]) { // fakes are not chained. We released them as if chained.
-					Wrap(This->dd_parent, This->xVtbl, (void**)&dx::fake[1]); // Get outter interface.
+			if (This->dds1 == dx::fake[0]) { // Release real surfaces when the fake primary is released
+				if (dx::fake[1]) { // fakes are not chained. We released them as if chained
+					Wrap(This->dd_parent, This->xVtbl, (void**)&dx::fake[1]); // Get outter interface
 					WrapRelease((WRAP*)dx::fake[1]);
 				}
 				if (dx::buffer) dx::buffer->lpVtbl->Release(dx::buffer);
-				if (dx::real[1]) dx::real[1]->lpVtbl->Release(dx::real[1]); // Release sequence matters for complex surfaces.
+				if (dx::real[1]) dx::real[1]->lpVtbl->Release(dx::real[1]); // Release sequence matters for complex surfaces
 				dx::real[0]->lpVtbl->Release(dx::real[0]);
 				dx::real[0] = dx::real[1] = dx::buffer = dx::fake[0] = dx::fake[1] = NULL;
 			} else if (This->dds1 == dx::fake[1]) {
-				dwCount = 1; // Emulate complex surface release behavior.
+				dwCount = 1; // Emulate complex surface release behavior
 				dx::fake[1] = NULL;
 			}
 		}
@@ -155,9 +155,9 @@ namespace dds
 		LPDIRECTDRAWSURFACE src = dx::MatchFlip(lpDDSrcSurface);
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		hResult = sf->lpVtbl->Blt(sf, lpDestRect, src, lpSrcRect, dwFlags, lpDDBltFx);
-		INFO("Blt %08X (%08X) <- %08X (%08X) : %08X, %08X\n", This->dds1, sf, lpDDSrcSurface, src, dwFlags, lpDDBltFx);
+		INFO("Blt %08X (%08X) <- %08X (%08X) dwFlags %08X, %08X\n", This->dds1, sf, lpDDSrcSurface, src, dwFlags, lpDDBltFx);
 		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Front
-			dx::Flush(sf);
+			dx::Flush(sf, lpDestRect);
 		}
 		EPILOGUE( hResult );
 	}
@@ -182,7 +182,12 @@ namespace dds
 		HRESULT hResult = sf->lpVtbl->BltFast(sf, dwX, dwY, src, lpSrcRect, dwTrans);
 		INFO("BltFast %08X (%08X) <- %08X (%08X) : %08X\n", This->dds1, sf, lpDDSrcSurface, src, dwTrans);
 		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Front
-			dx::Flush(sf);
+			if (lpSrcRect) {
+				RECT r = {(int)dwX, (int)dwY, lpSrcRect->right - lpSrcRect->left + (int)dwX, lpSrcRect->bottom - lpSrcRect->top + (int)dwY};
+				dx::Flush(sf, &r);
+			} else {
+				dx::Flush(sf);
+			}
 		}
 		EPILOGUE( hResult );
 	}
@@ -205,7 +210,7 @@ namespace dds
 			hResult = dx::fake[1]->lpVtbl->GetSurfaceDesc(dx::fake[1], &DDSurfaceDesc);
 			if (SUCCEEDED(hResult)) {
 				LPDIRECTDRAWSURFACE lpDDSurface = dx::fake[1];
-				Wrap(This->dd_parent, This->xVtbl, (void**)&lpDDSurface); // Get outter interface.
+				Wrap(This->dd_parent, This->xVtbl, (void**)&lpDDSurface); // Get outter interface
 				lpEnumSurfacesCallback(lpDDSurface, &DDSurfaceDesc, lpContext);
 			}
 		} else {
@@ -237,9 +242,9 @@ namespace dds
 	{
 		PROLOGUE;
 		HRESULT hResult;
-		if (dx::enabled) {
+		if (This->dds1 == dx::fake[0] || This->dds1 == dx::fake[1]) {
 			INFO("Flip to fake %d dwFlags %08X\n", !dx::flip, dwFlags);
-			hResult = dx::Flush(dx::fake[!dx::flip], 0, dwFlags); // Back
+			hResult = dx::Flush(dx::fake[!dx::flip], NULL, 0, dwFlags); // Back
 			if (SUCCEEDED(hResult)) dx::flip = !dx::flip;
 		} else {
 			hResult = This->dds1->lpVtbl->Flip( This->dds1, GetInnerInterface( lpDDSurfaceTargetOverride ), dwFlags );
@@ -280,7 +285,7 @@ namespace dds
 	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->GetClipper( This->dds1, lplpDDClipper );
-		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawClipper ), (void**)lplpDDClipper );
+		if (SUCCEEDED(hResult)) Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawClipper ), (void**)lplpDDClipper );
 		EPILOGUE( hResult );
 	}
 
@@ -295,7 +300,7 @@ namespace dds
 	{
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
-		// Set palette for offScreen surface in case it doesn't have one.
+		// Set palette for offScreen surface in case it doesn't have one
 		if (dx::palette && sf != dx::fake[0] && sf != dx::fake[1]) { sf->lpVtbl->SetPalette(sf, dx::palette); }
 		HRESULT hResult = sf->lpVtbl->GetDC(sf, lphDC);
 		INFO("GetDC %08X (%08X)\n", This->dds1, sf);
@@ -322,7 +327,7 @@ namespace dds
 	{
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->GetPalette( This->dds1, lplpDDPalette );
-		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawPalette ), (void**)lplpDDPalette );
+		if (SUCCEEDED(hResult)) Wrap( This->dd_parent, iid_to_vtbl( IID_IDirectDrawPalette ), (void**)lplpDDPalette );
 		EPILOGUE( hResult );
 	}
 
@@ -357,7 +362,7 @@ namespace dds
 		} else {
 			hResult = This->dds1->lpVtbl->IsLost(This->dds1);
 		}
-		INFO("IsLost %08X\n", This->dds1);
+		INFO("IsLost %08X -> %08X\n", This->dds1, hResult);
 		EPILOGUE( hResult );
 	}
 
@@ -366,8 +371,10 @@ namespace dds
 		PROLOGUE;
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This->dds1);
 		HRESULT hResult = sf->lpVtbl->Lock(sf, lpDestRect, lpDDSurfaceDesc, dwFlags, hEvent);
-		INFO("Lock %08X (%08X) dwFlags %08X\n", This->dds1, sf, dwFlags);
-		if (SUCCEEDED(hResult) && !(dwFlags & DDLOCK_READONLY)) dx::write = 1;
+		INFO("Lock %08X (%08X) rect %08X dwFlags %08X\n", This->dds1, sf, lpDestRect, dwFlags);
+		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0]) { // Front
+			dx::write = dwFlags & DDLOCK_READONLY ? 0 : 1;
+		}
 		EPILOGUE( hResult );
 	}
 
@@ -416,6 +423,18 @@ namespace dds
 		if (This->dds1 == dx::fake[0]) sf = dx::fake[1];
 		else if (This->dds1 == dx::fake[1]) sf = dx::fake[0];
 		if (sf) {
+			if (SUCCEEDED(sf->lpVtbl->GetClipper(sf, &old_clipper))) {
+				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
+			}
+			sf->lpVtbl->SetClipper(sf, lpDDClipper);
+			if (old_clipper != NULL) {
+				WrapRelease((WRAP*)old_clipper);
+				old_clipper = NULL;
+			}
+		}
+		if (This->dds1 == dx::fake[0] || This->dds1 == dx::fake[1]) {
+			dx::clipper = lpDDClipper;
+			sf = dx::real[0];
 			if (SUCCEEDED(sf->lpVtbl->GetClipper(sf, &old_clipper))) {
 				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
 			}
@@ -492,8 +511,7 @@ namespace dds
 		HRESULT hResult = sf->lpVtbl->Unlock(sf, lpData);
 		INFO("Unlock %08X (%08X)\n", This->dds1, sf);
 		if (SUCCEEDED(hResult) && This->dds1 == dx::fake[0] && dx::write) { // Front
-			dx::write = 0;
-			dx::Flush(sf);
+			dx::Flush(sf); // Should have captured the RECT, but lock on primary surface is unlikely to happen
 		}
 		EPILOGUE( hResult );
 	}
@@ -538,8 +556,8 @@ namespace dds
 
 	HRESULT __stdcall GetDDInterface( WRAP* This, LPVOID* lplpDD )
 	{
-		// theoretically returns IUnknown but some programs may cast it to a different interface pointer...
-		// instead of querying for the interface.
+		// theoretically returns IUnknown but some programs may cast it to a different interface pointer
+		// instead of querying for the interface
 		PROLOGUE;
 		HRESULT hResult = This->dds2->lpVtbl->GetDDInterface( This->dds2, lplpDD );
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, dds_to_dd_vtbl( This ), (void**)lplpDD );

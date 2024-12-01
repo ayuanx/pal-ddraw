@@ -12,6 +12,8 @@ namespace dx
 	DWORD flip = 0;
 	DWORD time = 0;
 	DWORD width = 0, height = 0, bpp = 0;
+	LPDIRECTDRAW dd = NULL;
+	LPDIRECTDRAWCLIPPER clipper = NULL;
 	LPDIRECTDRAWPALETTE palette = NULL;
 	LPDIRECTDRAWSURFACE real[2] = {NULL}, fake[2] = {NULL}, buffer = NULL;
 
@@ -23,9 +25,13 @@ namespace dx
 		return in;
 	}
 
-	HRESULT Flush(LPDIRECTDRAWSURFACE fk, DWORD pal, DWORD dwFlags) {
+	HRESULT Flush(LPDIRECTDRAWSURFACE fk, LPRECT rect, DWORD pal, DWORD dwFlags) {
 		HRESULT hResult = DD_OK;
 		DWORD now = 0;
+		DWORD x = rect ? rect->left : 0;
+		DWORD y = rect ? rect->top : 0;
+		DWORD w = rect ? rect->right - rect->left : width;
+		DWORD h = rect ? rect->bottom - rect->top : height;
 
 		if (UseThrottle && pal) { // Palette is capped at 60 FPS (16ms)
 			now = GetTickCount(); 
@@ -36,27 +42,34 @@ namespace dx
 		while (fk->lpVtbl->GetBltStatus(fk, DDGBS_ISBLTDONE) != DD_OK) Sleep(1);
 		HDC src, dest = NULL;
 		fk->lpVtbl->GetDC(fk, &src);
-		if (!NoBuffer) {
-			buffer->lpVtbl->GetDC(buffer, &dest);
-		} else {
+		if (NoBuffer) {
 			if ((hResult = real[caps]->lpVtbl->GetDC(real[caps], &dest)) == DDERR_SURFACELOST) {
 			       real[0]->lpVtbl->Restore(real[0]); // Restore() should only be called on primary surface
 			       hResult = real[caps]->lpVtbl->GetDC(real[caps], &dest);
 			}
-		}
-		if (SUCCEEDED(hResult)) BitBlt(dest, 0, 0, width, height, src, 0, 0, SRCCOPY);
-		fk->lpVtbl->ReleaseDC(fk, src);
-		if (!NoBuffer) {
-			buffer->lpVtbl->ReleaseDC(buffer, dest);
-			if ((hResult = real[caps]->lpVtbl->BltFast(real[caps], 0, 0, buffer, NULL, DDBLTFAST_NOCOLORKEY)) == DDERR_SURFACELOST) {
-			       real[0]->lpVtbl->Restore(real[0]); // Restore() should only be called on primary surface
-			       hResult = real[caps]->lpVtbl->BltFast(real[caps], 0, 0, buffer, NULL, DDBLTFAST_NOCOLORKEY);
-			}
 		} else {
+			hResult = buffer->lpVtbl->GetDC(buffer, &dest);
+		}
+		if (SUCCEEDED(hResult)) BitBlt(dest, x, y, w, h, src, x, y, SRCCOPY);
+		fk->lpVtbl->ReleaseDC(fk, src);
+		if (NoBuffer) {
 			real[caps]->lpVtbl->ReleaseDC(real[caps], dest);
+		} else {
+			buffer->lpVtbl->ReleaseDC(buffer, dest);
+			if (dx::clipper) { // BitFast does not support clipper
+				if ((hResult = real[caps]->lpVtbl->Blt(real[caps], rect, buffer, rect, NULL, NULL)) == DDERR_SURFACELOST) {
+					real[0]->lpVtbl->Restore(real[0]); // Restore() should only be called on primary surface
+					hResult = real[caps]->lpVtbl->Blt(real[caps], rect, buffer, rect, NULL, NULL);
+				}
+			} else {
+				if ((hResult = real[caps]->lpVtbl->BltFast(real[caps], x, y, buffer, rect, DDBLTFAST_NOCOLORKEY)) == DDERR_SURFACELOST) {
+					real[0]->lpVtbl->Restore(real[0]); // Restore() should only be called on primary surface
+					hResult = real[caps]->lpVtbl->BltFast(real[caps], x, y, buffer, rect, DDBLTFAST_NOCOLORKEY);
+				}
+			}
 		}
 		if (SUCCEEDED(hResult) && caps) hResult = real[0]->lpVtbl->Flip(real[0], NULL, dwFlags);
-		INFO("  Flush from fake %d to real by %d @ %08X\n", fk == fake[0] ? 0 : fk == fake[1] ? 1 : -1, pal, now);
+		INFO("  Flush fake %d to real rect %08X pal %d @ %08X\n", fk == fake[0] ? 0 : fk == fake[1] ? 1 : -1, rect, pal, now);
 		return hResult;
 	}
 }

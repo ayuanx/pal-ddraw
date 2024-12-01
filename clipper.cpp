@@ -76,6 +76,7 @@ namespace clipper
 	{
 		PROLOGUE;
 		HRESULT hResult = This->clip->lpVtbl->SetHWnd( This->clip, dwFlags, hWnd );
+		INFO("SetHWnd %08X to %08X dwFlags %08X\n", hWnd, This->clip, dwFlags);
 		EPILOGUE( hResult );
 	}
 
