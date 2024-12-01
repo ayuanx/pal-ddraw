@@ -26,7 +26,7 @@ In such cases, pal-ddraw may help you, especially when you need to run on a lega
 
 1. Make sure the game is indeed designed to run in a specific DirectDraw color depth mode (e.g. 8-bit or 16-bit) which your current Windows does not support.
 
-Tip: If the game does not utilize DirectDraw at all, or if the game already supports your current desktop color depth (which is usually 32-bit color depth) natively, then you don't need this wrapper.
+Tip: If the game does not utilize DirectDraw at all, or if the game already supports your current desktop color depth (usually 32-bit) natively, then you don't need this wrapper.
 
 2. Extract the dll file and the ini file to the game folder where the game's main executable file is located.
 
@@ -34,19 +34,25 @@ Tip: If the game does not utilize DirectDraw at all, or if the game already supp
 
 4. Run the game in full screen mode and enjoy the DirectDraw color depth emulation.
 
+Tip: By default only full screen mode emulation is enabled. To also enable window mode emulation, modify the "BPP" option in "ddraw.ini" file to either 8, 16, 24 or 32 for 8-bit/16-bit/24-bit/32-bit color depth emulation.
+
+Tip: If the game runs too fast in full screen mode, modify the "UseFlip" option in "ddraw.ini" file to 1 usually slows it down. 
+
 # Notes:
 
 * I know there are already several other DirectDraw wrappers, but they all forward the rendering to either Direct3D 8/9/10 or OpenGL2/Vulkan, which means they won't run on legacy OS like Win95/98/XP. My goal is support all legacy and modern OSes on both real machines and virtual machines.
 
-* Emulating DirectDraw color depth by falling back to GDI inevitablly incurs some performance loss, but this is generally negligible for old games whose native resolution is usually rather low like 640x480, 800x600, or 1024x768.
-
-* Currently only full screen mode emulation is implemented. Window mode emulation may be implemented later. 
+* Emulating DirectDraw color depth by falling back to GDI inevitablly incurs some performance loss, but this is negligible for old games whose native resolution is usually rather low like 640x480, 800x600, or 1024x768.
 
 # Building:
 
 - Use MinGW-w64 x86 (32-bit) to build on Windows OS.
 
 # Revisions:
+
+v.2024.12.02
+- Support color depth emulation in window mode.
+- Support multiple DirectDraw objects.
 
 v.2024.09.28
 - Improve palette compatibility for legacy Windows versions like Win98 and WinXP.
