@@ -48,7 +48,7 @@ namespace dd
 	{
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->QueryInterface( This->dd1, riid, ppvObject );
-		INFO("QueryInterface DD %08X -> %08X\n", This->dd1, *ppvObject);
+		INFO("QueryInterface DD %08X -> %08X (IID %08X)\n", This->dd1, *ppvObject, riid);
 		if( SUCCEEDED( hResult ) ) Wrap( This->dd_parent, iid_to_vtbl( riid ), ppvObject );
 		EPILOGUE( hResult );
 	}
@@ -103,11 +103,11 @@ namespace dd
 	{
 		PROLOGUE;
 		HRESULT hResult;
-		INFO("CreateSurface dwCaps %08X\n", lpDDSurfaceDesc->ddsCaps.dwCaps);
-		if (dx::enabled && This->dd1 == dx::dd) {
+		INFO("CreateSurface DD %08X dwCaps %08X\n", This->dd1, lpDDSurfaceDesc->ddsCaps.dwCaps);
+		if (This->dd_parent->enabled) {
 			if (lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) {
 				bool dual = lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_COMPLEX;
-				if (dx::caps) {
+				if (This->dd_parent->caps) {
 					lpDDSurfaceDesc->dwFlags = DDSD_BACKBUFFERCOUNT | DDSD_CAPS;
 					lpDDSurfaceDesc->dwBackBufferCount = 1; // We only support 1 back buffer yet.
 					lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE | DDSCAPS_FLIP | DDSCAPS_COMPLEX;
@@ -115,63 +115,63 @@ namespace dd
 					lpDDSurfaceDesc->dwFlags = DDSD_CAPS;
 					lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
 				}
-				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::real[0], pUnkOuter);
+				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &This->dd_parent->real[0], pUnkOuter);
 				if (SUCCEEDED(hResult)) {
-					if (dx::caps) {
+					if (This->dd_parent->caps) {
 						DDSCAPS ddsCaps = {0};
 						ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
-						hResult = dx::real[0]->lpVtbl->GetAttachedSurface(dx::real[0], &ddsCaps, &dx::real[1]);
+						hResult = This->dd_parent->real[0]->lpVtbl->GetAttachedSurface(This->dd_parent->real[0], &ddsCaps, &This->dd_parent->real[1]);
 					} else {
-						dx::real[1] = NULL;
+						This->dd_parent->real[1] = NULL;
 					}
-					INFO("  realFront: %08X, realBack: %08X\n", dx::real[0], dx::real[1]);
+					INFO("  realFront: %08X, realBack: %08X\n", This->dd_parent->real[0], This->dd_parent->real[1]);
 
 					if (dx::NoBuffer) {
-						dx::buffer = NULL;
+						This->dd_parent->buffer = NULL;
 					} else {
 						lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS;
-						lpDDSurfaceDesc->dwHeight = dx::height;
-						lpDDSurfaceDesc->dwWidth = dx::width;
+						lpDDSurfaceDesc->dwHeight = This->dd_parent->height;
+						lpDDSurfaceDesc->dwWidth = This->dd_parent->width;
 						lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
-						hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::buffer, pUnkOuter);
-						INFO("  buffer: %08X\n", dx::buffer);
+						hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &This->dd_parent->buffer, pUnkOuter);
+						INFO("  buffer: %08X\n", This->dd_parent->buffer);
 					}
 
 					lpDDSurfaceDesc->dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS | DDSD_PIXELFORMAT;
-					lpDDSurfaceDesc->dwHeight = dx::height;
-					lpDDSurfaceDesc->dwWidth = dx::width;
+					lpDDSurfaceDesc->dwHeight = This->dd_parent->height;
+					lpDDSurfaceDesc->dwWidth = This->dd_parent->width;
 					lpDDSurfaceDesc->ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
 					lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-					lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = dx::bpp == 8 ? DDPF_RGB | DDPF_PALETTEINDEXED8 : DDPF_RGB;
-					lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = dx::bpp;
-					lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0xF800 : 0xFF0000);
-					lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0x07E0 : 0x00FF00);
-					lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0x001F : 0x0000FF);
+					lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = This->dd_parent->bpp == 8 ? DDPF_RGB | DDPF_PALETTEINDEXED8 : DDPF_RGB;
+					lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = This->dd_parent->bpp;
+					lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0xF800 : 0xFF0000);
+					lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0x07E0 : 0x00FF00);
+					lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0x001F : 0x0000FF);
 					lpDDSurfaceDesc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
 					if (SUCCEEDED(hResult) && dual) {
-						hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fake[1], pUnkOuter);
-						*lplpDDSurface = dx::fake[1];
+						hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &This->dd_parent->fake[1], pUnkOuter);
+						*lplpDDSurface = This->dd_parent->fake[1];
 						Wrap(This->dd_parent, dd_to_dds_vtbl(This), (void**)lplpDDSurface);
 					} else {
-						dx::fake[1] = NULL;
+						This->dd_parent->fake[1] = NULL;
 					}
-					if (SUCCEEDED(hResult)) hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &dx::fake[0], pUnkOuter);
-					*lplpDDSurface = dx::fake[0];
-					INFO("  fakeFront: %08X, fakeBack: %08X\n", dx::fake[0], dx::fake[1]);
+					if (SUCCEEDED(hResult)) hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &This->dd_parent->fake[0], pUnkOuter);
+					*lplpDDSurface = This->dd_parent->fake[0];
+					INFO("  fakeFront: %08X, fakeBack: %08X\n", This->dd_parent->fake[0], This->dd_parent->fake[1]);
 				}
 			} else {
 				lpDDSurfaceDesc->dwFlags |= DDSD_CAPS | DDSD_PIXELFORMAT;
 				lpDDSurfaceDesc->ddsCaps.dwCaps |= DDSCAPS_OFFSCREENPLAIN | DDSCAPS_SYSTEMMEMORY;
 				lpDDSurfaceDesc->ddsCaps.dwCaps &= ~DDSCAPS_VIDEOMEMORY;
 				lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-				lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = dx::bpp == 8 ? DDPF_RGB | DDPF_PALETTEINDEXED8 : DDPF_RGB;
-				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = dx::bpp;
-				lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0xF800 : 0xFF0000);
-				lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0x07E0 : 0x00FF00);
-				lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0x001F : 0x0000FF);
+				lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = This->dd_parent->bpp == 8 ? DDPF_RGB | DDPF_PALETTEINDEXED8 : DDPF_RGB;
+				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = This->dd_parent->bpp;
+				lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0xF800 : 0xFF0000);
+				lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0x07E0 : 0x00FF00);
+				lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0x001F : 0x0000FF);
 				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
 				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter);
-				if (SUCCEEDED(hResult) && dx::palette) (*lplpDDSurface)->lpVtbl->SetPalette(*lplpDDSurface, dx::palette);
+				if (SUCCEEDED(hResult) && This->dd_parent->palette) (*lplpDDSurface)->lpVtbl->SetPalette(*lplpDDSurface, This->dd_parent->palette);
 				INFO("  offScreen %08X\n", *lplpDDSurface);
 			}
 		} else {
@@ -228,7 +228,7 @@ namespace dd
 	{
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetCaps( This->dd1, lpDDDriverCaps, lpDDHELCaps );
-		INFO("GetCaps DRV %08X HEL %08X\n", lpDDDriverCaps, lpDDHELCaps);
+		INFO("GetCaps DD %08X DRV %08X HEL %08X\n", This->dd1, lpDDDriverCaps, lpDDHELCaps);
 		EPILOGUE( hResult );
 	}
 
@@ -236,17 +236,17 @@ namespace dd
 	{
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetDisplayMode( This->dd1, lpDDSurfaceDesc );
-		if (dx::enabled && This->dd1 == dx::dd && (lpDDSurfaceDesc->dwFlags & DDSD_PIXELFORMAT)) {
+		if (This->dd_parent->enabled && (lpDDSurfaceDesc->dwFlags & DDSD_PIXELFORMAT)) {
 			lpDDSurfaceDesc->ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-			lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = dx::bpp == 8 ? DDPF_RGB | DDPF_PALETTEINDEXED8 : DDPF_RGB;
-			lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = dx::bpp;
-			lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0xF800 : 0xFF0000);
-			lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0x07E0 : 0x00FF00);
-			lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask = dx::bpp == 8 ? 0 : (dx::bpp == 16 ? 0x001F : 0x0000FF);
+			lpDDSurfaceDesc->ddpfPixelFormat.dwFlags = This->dd_parent->bpp == 8 ? DDPF_RGB | DDPF_PALETTEINDEXED8 : DDPF_RGB;
+			lpDDSurfaceDesc->ddpfPixelFormat.dwRGBBitCount = This->dd_parent->bpp;
+			lpDDSurfaceDesc->ddpfPixelFormat.dwRBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0xF800 : 0xFF0000);
+			lpDDSurfaceDesc->ddpfPixelFormat.dwGBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0x07E0 : 0x00FF00);
+			lpDDSurfaceDesc->ddpfPixelFormat.dwBBitMask = This->dd_parent->bpp == 8 ? 0 : (This->dd_parent->bpp == 16 ? 0x001F : 0x0000FF);
 			lpDDSurfaceDesc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
 		}
 		// TODO: May need to fix lPitch too.
-		INFO("GetDisplayMode %08X\n", This->dd1);
+		INFO("GetDisplayMode DD %08X\n", This->dd1);
 		EPILOGUE( hResult );
 	}
 
@@ -297,36 +297,40 @@ namespace dd
 	HRESULT __stdcall RestoreDisplayMode( WRAP* This )
 	{
 		PROLOGUE;
+		INFO("RestoreDisplayMode DD %08X\n", This->dd1);
 		HRESULT hResult = This->dd1->lpVtbl->RestoreDisplayMode( This->dd1 );
-		INFO("RestoreDisplayMode %08X\n", This->dd1);
+		if (This->dd_parent->enabled) {
+			This->dd_parent->caps = 0;
+			This->dd_parent->width = GetSystemMetrics(SM_CXSCREEN);
+			This->dd_parent->height = GetSystemMetrics(SM_CYSCREEN);
+			INFO("  restored %d x %d x %d\n", This->dd_parent->width, This->dd_parent->height, This->dd_parent->bpp);
+		}
 		EPILOGUE( hResult );
 	}
 
 	HRESULT __stdcall SetCooperativeLevel( WRAP* This, HWND hWnd, DWORD dwFlags )
 	{ 		
 		PROLOGUE;
-		INFO("SetCooperativeLevel dwFlags %08X\n", dwFlags);
-		if (!dx::dd) {
-			if (dx::UseFlip && (dwFlags & DDSCL_FULLSCREEN)) {
-				DDCAPS ddcaps = {0};
-				ddcaps.dwSize = sizeof(ddcaps);
-				This->dd1->lpVtbl->GetCaps(This->dd1, &ddcaps, NULL);
-				if (ddcaps.ddsCaps.dwCaps & DDSCAPS_FLIP) dx::caps = 1;
-				INFO("  DDCAPS.DDSCAPS.DWCAPS %08X dx::caps %d\n", ddcaps.ddsCaps.dwCaps, dx::caps);
-			} else {
-				dx::caps = 0;
-			}
-			if (dx::bpp && (dwFlags & DDSCL_NORMAL)) {
-				HDC dc = GetDC(NULL);
-				DWORD bpp = GetDeviceCaps(dc, BITSPIXEL) * GetDeviceCaps(dc, PLANES);
-				ReleaseDC(NULL, dc);
-				if (bpp != dx::bpp) {
-					dx::enabled = 1;
-					dx::dd = This->dd1;
-					dx::width = GetSystemMetrics(SM_CXSCREEN);
-					dx::height = GetSystemMetrics(SM_CYSCREEN);
-					INFO("  enabled: %d x %d x %d -> %d\n", dx::width, dx::height, dx::bpp, bpp);
-				}
+		INFO("SetCooperativeLevel DD %08X dwFlags %08X\n", This->dd1, dwFlags);
+		if (dx::UseFlip && (dwFlags & DDSCL_FULLSCREEN)) {
+			DDCAPS ddcaps = {0};
+			ddcaps.dwSize = sizeof(ddcaps);
+			This->dd1->lpVtbl->GetCaps(This->dd1, &ddcaps, NULL);
+			if (ddcaps.ddsCaps.dwCaps & DDSCAPS_FLIP) This->dd_parent->caps = 1;
+			INFO("  DDCAPS.DDSCAPS.DWCAPS %08X dx::caps %d\n", ddcaps.ddsCaps.dwCaps, This->dd_parent->caps);
+		} else {
+			This->dd_parent->caps = 0;
+		}
+		if (dx::BPP && (dwFlags & DDSCL_NORMAL)) {
+			HDC dc = GetDC(NULL);
+			DWORD bpp = GetDeviceCaps(dc, BITSPIXEL) * GetDeviceCaps(dc, PLANES);
+			ReleaseDC(NULL, dc);
+			if (bpp != dx::BPP) {
+				This->dd_parent->enabled = 1;
+				This->dd_parent->width = GetSystemMetrics(SM_CXSCREEN);
+				This->dd_parent->height = GetSystemMetrics(SM_CYSCREEN);
+				This->dd_parent->bpp = dx::BPP;
+				INFO("  enabled: %d x %d x %d -> %d\n", This->dd_parent->width, This->dd_parent->height, This->dd_parent->bpp, bpp);
 			}
 		}
 		HRESULT hResult = This->dd1->lpVtbl->SetCooperativeLevel( This->dd1, hWnd, dwFlags );
@@ -337,20 +341,17 @@ namespace dd
 	HRESULT __stdcall SetDisplayMode1( WRAP* This, DWORD dwWidth, DWORD dwHeight, DWORD dwBPP )
 	{
 		PROLOGUE;
-		INFO("SetDisplayMode1 %d x %d x %d\n", dwWidth, dwHeight, dwBPP);
-		if (!dx::dd) {
-			HDC dc = GetDC(NULL);
-			DWORD bpp = GetDeviceCaps(dc, BITSPIXEL) * GetDeviceCaps(dc, PLANES);
-			ReleaseDC(NULL, dc);
-			if (bpp != dwBPP) {
-				dx::enabled = 1;
-				dx::dd = This->dd1;
-				dx::width = dwWidth;
-				dx::height = dwHeight;
-				dx::bpp = dwBPP;
-				dwBPP = bpp;
-				INFO("  enabled: %d -> %d\n", dx::bpp, bpp);
-			}
+		INFO("SetDisplayMode1 DD %08X %d x %d x %d\n", This->dd1, dwWidth, dwHeight, dwBPP);
+		HDC dc = GetDC(NULL);
+		DWORD bpp = GetDeviceCaps(dc, BITSPIXEL) * GetDeviceCaps(dc, PLANES);
+		ReleaseDC(NULL, dc);
+		if (bpp != dwBPP) {
+			This->dd_parent->enabled = 1;
+			This->dd_parent->width = dwWidth;
+			This->dd_parent->height = dwHeight;
+			This->dd_parent->bpp = dwBPP;
+			dwBPP = bpp;
+			INFO("  enabled: %d -> %d\n", This->dd_parent->bpp, bpp);
 		}
 		HRESULT hResult = This->dd1->lpVtbl->SetDisplayMode(This->dd1, dwWidth, dwHeight, dwBPP);
 		EPILOGUE( hResult );
@@ -359,20 +360,17 @@ namespace dd
 	HRESULT __stdcall SetDisplayMode2( WRAP* This, DWORD dwWidth, DWORD dwHeight, DWORD dwBPP, DWORD dwRefreshRate, DWORD dwFlags )
 	{
 		PROLOGUE;
-		INFO("SetDisplayMode2 %d x %d x %d\n", dwWidth, dwHeight, dwBPP);
-		if (!dx::dd) {
-			HDC dc = GetDC(NULL);
-			DWORD bpp = GetDeviceCaps(dc, BITSPIXEL) * GetDeviceCaps(dc, PLANES);
-			ReleaseDC(NULL, dc);
-			if (bpp != dwBPP) {
-				dx::enabled = 1;
-				dx::dd = This->dd1;
-				dx::width = dwWidth;
-				dx::height = dwHeight;
-				dx::bpp = dwBPP;
-				dwBPP = bpp;
-				INFO("  enabled: %d -> %d\n", dx::bpp, bpp);
-			}
+		INFO("SetDisplayMode2 DD %08X %d x %d x %d\n", This->dd1, dwWidth, dwHeight, dwBPP);
+		HDC dc = GetDC(NULL);
+		DWORD bpp = GetDeviceCaps(dc, BITSPIXEL) * GetDeviceCaps(dc, PLANES);
+		ReleaseDC(NULL, dc);
+		if (bpp != dwBPP) {
+			This->dd_parent->enabled = 1;
+			This->dd_parent->width = dwWidth;
+			This->dd_parent->height = dwHeight;
+			This->dd_parent->bpp = dwBPP;
+			dwBPP = bpp;
+			INFO("  enabled: %d -> %d\n", This->dd_parent->bpp, bpp);
 		}
 		HRESULT hResult = This->dd2->lpVtbl->SetDisplayMode(This->dd2, dwWidth, dwHeight, dwBPP, dwRefreshRate, dwFlags);
 		EPILOGUE( hResult );

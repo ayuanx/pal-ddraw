@@ -61,12 +61,12 @@ namespace palette
 		PROLOGUE;
 		HRESULT hResult = This->pal->lpVtbl->SetEntries( This->pal, dwFlags, dwStartingEntry, dwCount, lpEntries );
 		INFO("SetEntries offset %d cnt %d\n", dwStartingEntry, dwCount);
-		if (SUCCEEDED(hResult) && (This->pal == dx::palette)) {
-			if (dx::enabled > 256) { // Palette is fully initialized.
-				dx::Flush(dx::fake[dx::flip], NULL, 1);
+		if (SUCCEEDED(hResult) && (This->pal == This->dd_parent->palette)) {
+			if (This->dd_parent->enabled > 256) { // Palette is fully initialized.
+				dx::Flush(This, This->dd_parent->fake[This->dd_parent->flip], NULL, 1);
 			} else {
-				if (dx::enabled == 1) dx::Flush(dx::fake[dx::flip], NULL, 1); // Initial draw.
-				dx::enabled += dwCount;
+				if (This->dd_parent->enabled == 1) dx::Flush(This, This->dd_parent->fake[This->dd_parent->flip], NULL, 1); // Initial draw.
+				This->dd_parent->enabled += dwCount;
 			}
 		}
 		EPILOGUE( hResult );

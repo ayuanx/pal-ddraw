@@ -2,10 +2,23 @@
 // we've got no good way to known if an dd obj is destroyed
 // a dd obj is destroyed when it has no active interfaces...
 // a dd object can have many interfaces at once... IDirectDraw, IDirectDraw2, IDirectDraw4, IDirectDraw7 and IUnknown
+
 struct DD_LIFETIME
 {
 	IUnknown* obj;
 	unsigned long iface_cnt;
+	DWORD enabled;
+	DWORD caps;
+	DWORD write;
+	DWORD flip;
+	DWORD width;
+	DWORD height;
+	DWORD bpp;
+	LPDIRECTDRAWCLIPPER clipper;
+	LPDIRECTDRAWPALETTE palette;
+	LPDIRECTDRAWSURFACE buffer;
+	LPDIRECTDRAWSURFACE fake[2];
+	LPDIRECTDRAWSURFACE real[2];
 	DD_LIFETIME* next;
 };
 

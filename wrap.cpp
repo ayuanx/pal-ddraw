@@ -135,6 +135,7 @@ bool Wrap( DD_LIFETIME* dd_parent, const void* xVtbl, void** ppvInterface )
 						}
 						if( dd_parent != NULL )
 						{
+							memset(dd_parent, 0, sizeof(*dd_parent));
 							((IUnknown*)(*ppvInterface))->lpVtbl->QueryInterface( ((IUnknown*)(*ppvInterface)), IID_IUnknown, (void**)&dd_parent->obj );
 							dd_parent->obj->lpVtbl->Release( dd_parent->obj );
 							dd_parent->iface_cnt = 1;
@@ -240,7 +241,7 @@ HRESULT __stdcall WrapEnumSurfacesCallback( LPDIRECTDRAWSURFACE lpDDSurface, LPD
 	PROLOGUE;
 	HRESULT hResult;
 	EnumStruct* e = (EnumStruct*)lpContext;
-	if (lpDDSurface == dx::real[0] || lpDDSurface == dx::real[1] || lpDDSurface == dx::buffer) {
+	if (lpDDSurface == e->dd_parent->real[0] || lpDDSurface == e->dd_parent->real[1] || lpDDSurface == e->dd_parent->buffer) {
 		hResult = DDENUMRET_OK; // hide our internal surfaces
 	} else {
 		bool bNew = Wrap( e->dd_parent, e->xVtbl, (void**)&lpDDSurface );
