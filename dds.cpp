@@ -421,18 +421,8 @@ namespace dds
 		}
 
 		LPDIRECTDRAWSURFACE sf = NULL;
-		if (This->dds1 == This->dd_parent->fake[0]) sf = This->dd_parent->fake[1];
-		else if (This->dds1 == This->dd_parent->fake[1]) sf = This->dd_parent->fake[0];
-		if (sf) {
+		if (This->dds1 == This->dd_parent->fake[0]) {
 			This->dd_parent->clipper = lpDDClipper;
-			if (SUCCEEDED(sf->lpVtbl->GetClipper(sf, &old_clipper))) {
-				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
-			}
-			sf->lpVtbl->SetClipper(sf, lpDDClipper);
-			if (old_clipper != NULL) {
-				WrapRelease((WRAP*)old_clipper);
-				old_clipper = NULL;
-			}
 			sf = This->dd_parent->real[0];
 			if (SUCCEEDED(sf->lpVtbl->GetClipper(sf, &old_clipper))) {
 				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
@@ -441,6 +431,17 @@ namespace dds
 			if (old_clipper != NULL) {
 				WrapRelease((WRAP*)old_clipper);
 				old_clipper = NULL;
+			}
+			sf = This->dd_parent->fake[1];
+			if (sf) {	// We may not have a fake back surface
+				if (SUCCEEDED(sf->lpVtbl->GetClipper(sf, &old_clipper))) {
+					Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
+				}
+				sf->lpVtbl->SetClipper(sf, lpDDClipper);
+				if (old_clipper != NULL) {
+					WrapRelease((WRAP*)old_clipper);
+					old_clipper = NULL;
+				}
 			}
 		}
 		EPILOGUE( hResult );

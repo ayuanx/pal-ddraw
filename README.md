@@ -38,6 +38,14 @@ Tip: By default only full screen mode emulation is enabled. To also enable windo
 
 Tip: If the game runs too fast in full screen mode, modify the "UseFlip" option in "ddraw.ini" file to 1 usually slows it down. 
 
+# Requirement:
+
+- Minimum operating system: Windows XP or newer. 
+
+NOTE: It actually can also work on Win95/98 if you follow the extra procedure below:
+1. Rename "ddraw.dll" to "xdraw.dll", and rename "ddraw.ini" to "xdraw.ini".
+2. Use a hex editor to open the game's exe file, then replace all occurrences of string "ddraw.dll" (case-insensitive) to "xdraw.dll".
+
 # Notes:
 
 * I know there are already several other DirectDraw wrappers, but they all forward the rendering to either Direct3D 8/9/10 or OpenGL2/Vulkan, which means they won't run on legacy OS like Win95/98/XP. My goal is support all legacy and modern OSes on both real machines and virtual machines.
@@ -49,6 +57,9 @@ Tip: If the game runs too fast in full screen mode, modify the "UseFlip" option 
 - Use MinGW-w64 x86 (32-bit) to build on Windows OS.
 
 # Revisions:
+
+v.2025.06.13
+- Fix a bug in clipper when window mode emulation is enabled.
 
 v.2024.12.02
 - Support color depth emulation in window mode.
