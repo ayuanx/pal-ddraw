@@ -420,10 +420,10 @@ namespace dds
 			old_clipper = NULL;
 		}
 
-		LPDIRECTDRAWSURFACE sf = NULL;
 		if (This->dds1 == This->dd_parent->fake[0]) {
 			This->dd_parent->clipper = lpDDClipper;
-			sf = This->dd_parent->real[0];
+			INFO("  Parent clipper is set\n");
+			LPDIRECTDRAWSURFACE sf = This->dd_parent->real[0];
 			if (SUCCEEDED(sf->lpVtbl->GetClipper(sf, &old_clipper))) {
 				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawClipper), (void**)&old_clipper);
 			}
@@ -452,12 +452,11 @@ namespace dds
 		PROLOGUE;
 		HRESULT hResult = This->dds1->lpVtbl->SetColorKey(This->dds1, dwFlags, lpDDColorKey);
 		INFO("SetColorKey L:%08X H:%08X to %08X dwFlags %08X\n", lpDDColorKey->dwColorSpaceLowValue, lpDDColorKey->dwColorSpaceHighValue, This->dds1, dwFlags);
-
-		LPDIRECTDRAWSURFACE sf = NULL;
-		if (This->dds1 == This->dd_parent->fake[0]) sf = This->dd_parent->fake[1];
-		else if (This->dds1 == This->dd_parent->fake[1]) sf = This->dd_parent->fake[0];
-		if (sf) {
-			sf->lpVtbl->SetColorKey(sf, dwFlags, lpDDColorKey);
+		if (This->dds1 == This->dd_parent->fake[0]) {
+			LPDIRECTDRAWSURFACE sf = This->dd_parent->fake[1];
+			if (sf) {	// We may not have a fake back surface
+				sf->lpVtbl->SetColorKey(sf, dwFlags, lpDDColorKey);
+			}
 		}
 		EPILOGUE( hResult );
 	}
@@ -485,18 +484,19 @@ namespace dds
 			old_palette = NULL;
 		}
 
-		LPDIRECTDRAWSURFACE sf = NULL;
-		if (This->dds1 == This->dd_parent->fake[0]) sf = This->dd_parent->fake[1];
-		else if (This->dds1 == This->dd_parent->fake[1]) sf = This->dd_parent->fake[0];
-		if (sf) {
+		if (This->dds1 == This->dd_parent->fake[0]) { 
 			This->dd_parent->palette = lpDDPalette;
-			if (SUCCEEDED(sf->lpVtbl->GetPalette(sf, &old_palette))) {
-				Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawPalette), (void**)&old_palette);
-			}
-			sf->lpVtbl->SetPalette(sf, lpDDPalette);
-			if(old_palette != NULL) {
-				WrapRelease((WRAP*)old_palette);
-				old_palette = NULL;
+			INFO("  Parent palette is set\n");
+			LPDIRECTDRAWSURFACE sf = This->dd_parent->fake[1];
+			if (sf) {	// We may not have a fake back surface
+				if (SUCCEEDED(sf->lpVtbl->GetPalette(sf, &old_palette))) {
+					Wrap(This->dd_parent, iid_to_vtbl(IID_IDirectDrawPalette), (void**)&old_palette);
+				}
+				sf->lpVtbl->SetPalette(sf, lpDDPalette);
+				if(old_palette != NULL) {
+					WrapRelease((WRAP*)old_palette);
+					old_palette = NULL;
+				}
 			}
 		}
 		EPILOGUE( hResult );
