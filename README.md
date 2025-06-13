@@ -59,7 +59,7 @@ NOTE: It actually can also work on Win95/98 if you follow the extra procedure be
 # Revisions:
 
 v.2025.06.13
-- Fix a bug in clipper when window mode emulation is enabled.
+- Fix a bug in clipper/palette when window mode emulation is enabled.
 
 v.2024.12.02
 - Support color depth emulation in window mode.
