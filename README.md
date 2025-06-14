@@ -58,8 +58,9 @@ NOTE: It actually can also work on Win95/98 if you follow the extra procedure be
 
 # Revisions:
 
-v.2025.06.13
+v.2025.06.14
 - Fix a bug in clipper/palette when window mode emulation is enabled.
+- Improve compatibility for GDI surface in virtual machines.
 
 v.2024.12.02
 - Support color depth emulation in window mode.

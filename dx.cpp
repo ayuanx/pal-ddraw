@@ -16,6 +16,26 @@ namespace dx
 		return in;
 	}
 
+	HRESULT Stretch(WRAP* wp, LPDIRECTDRAWSURFACE dst, LPRECT dstRect, LPDIRECTDRAWSURFACE src, LPRECT srcRect) {
+		DWORD srcX = srcRect ? srcRect->left : 0;
+		DWORD srcY = srcRect ? srcRect->top : 0;
+		DWORD srcW = srcRect ? srcRect->right - srcRect->left : wp->dd_parent->width;
+		DWORD srcH = srcRect ? srcRect->bottom - srcRect->top : wp->dd_parent->height;
+		DWORD dstX = dstRect ? dstRect->left : 0;
+		DWORD dstY = dstRect ? dstRect->top : 0;
+		DWORD dstW = dstRect ? dstRect->right - dstRect->left : wp->dd_parent->width;
+		DWORD dstH = dstRect ? dstRect->bottom - dstRect->top : wp->dd_parent->height;
+
+		HDC srcDC = NULL, dstDC = NULL;
+		HRESULT hResult = src->lpVtbl->GetDC(src, &srcDC);
+		if (SUCCEEDED(hResult)) hResult = dst->lpVtbl->GetDC(dst, &dstDC);
+		if (SUCCEEDED(hResult)) StretchBlt(dstDC, dstX, dstY, dstW, dstH, srcDC, srcX, srcY, srcW, srcH, SRCCOPY);	// We only support SCRCOPY for now
+		INFO("  Stretch %08X <- %08X\n", dst, src);
+		src->lpVtbl->ReleaseDC(src, srcDC);
+		dst->lpVtbl->ReleaseDC(dst, dstDC);
+		return hResult;
+	}
+
 	HRESULT Flush(WRAP* wp, LPDIRECTDRAWSURFACE fk, LPRECT rect, DWORD pal, DWORD dwFlags) {
 		HRESULT hResult = DD_OK;
 		DWORD now = 0;
@@ -31,22 +51,24 @@ namespace dx
 		}
 
 		while (fk->lpVtbl->GetBltStatus(fk, DDGBS_ISBLTDONE) != DD_OK) Sleep(1);
-		HDC src, dest = NULL;
-		fk->lpVtbl->GetDC(fk, &src);
-		if (NoBuffer) {
-			if ((hResult = wp->dd_parent->real[wp->dd_parent->caps]->lpVtbl->GetDC(wp->dd_parent->real[wp->dd_parent->caps], &dest)) == DDERR_SURFACELOST) {
-			       wp->dd_parent->real[0]->lpVtbl->Restore(wp->dd_parent->real[0]); // Restore() should only be called on primary surface
-			       hResult = wp->dd_parent->real[wp->dd_parent->caps]->lpVtbl->GetDC(wp->dd_parent->real[wp->dd_parent->caps], &dest);
+		HDC src = NULL, dst = NULL;
+		hResult = fk->lpVtbl->GetDC(fk, &src);
+		if (SUCCEEDED(hResult)) {
+			if (NoBuffer) {
+				if ((hResult = wp->dd_parent->real[wp->dd_parent->caps]->lpVtbl->GetDC(wp->dd_parent->real[wp->dd_parent->caps], &dst)) == DDERR_SURFACELOST) {
+					wp->dd_parent->real[0]->lpVtbl->Restore(wp->dd_parent->real[0]); // Restore() should only be called on primary surface
+					hResult = wp->dd_parent->real[wp->dd_parent->caps]->lpVtbl->GetDC(wp->dd_parent->real[wp->dd_parent->caps], &dst);
+				}
+			} else {
+				hResult = wp->dd_parent->buffer->lpVtbl->GetDC(wp->dd_parent->buffer, &dst);
 			}
-		} else {
-			hResult = wp->dd_parent->buffer->lpVtbl->GetDC(wp->dd_parent->buffer, &dest);
 		}
-		if (SUCCEEDED(hResult)) BitBlt(dest, x, y, w, h, src, x, y, SRCCOPY);
+		if (SUCCEEDED(hResult)) BitBlt(dst, x, y, w, h, src, x, y, SRCCOPY);
 		fk->lpVtbl->ReleaseDC(fk, src);
 		if (NoBuffer) {
-			wp->dd_parent->real[wp->dd_parent->caps]->lpVtbl->ReleaseDC(wp->dd_parent->real[wp->dd_parent->caps], dest);
+			wp->dd_parent->real[wp->dd_parent->caps]->lpVtbl->ReleaseDC(wp->dd_parent->real[wp->dd_parent->caps], dst);
 		} else {
-			wp->dd_parent->buffer->lpVtbl->ReleaseDC(wp->dd_parent->buffer, dest);
+			wp->dd_parent->buffer->lpVtbl->ReleaseDC(wp->dd_parent->buffer, dst);
 			if (wp->dd_parent->clipper) { // BitFast does not support clipper
 				if ((hResult = wp->dd_parent->real[wp->dd_parent->caps]->lpVtbl->Blt(wp->dd_parent->real[wp->dd_parent->caps], rect, wp->dd_parent->buffer, rect, NULL, NULL)) == DDERR_SURFACELOST) {
 					wp->dd_parent->real[0]->lpVtbl->Restore(wp->dd_parent->real[0]); // Restore() should only be called on primary surface

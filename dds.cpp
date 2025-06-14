@@ -152,11 +152,20 @@ namespace dds
 		}
 		*/
 		lpDDSrcSurface = GetInnerInterface(lpDDSrcSurface);
-
 		LPDIRECTDRAWSURFACE src = dx::MatchFlip(This, lpDDSrcSurface);
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This, This->dds1);
-		hResult = sf->lpVtbl->Blt(sf, lpDestRect, src, lpSrcRect, dwFlags, lpDDBltFx);
+
 		INFO("Blt %08X (%08X) <- %08X (%08X) dwFlags %08X, %08X\n", This->dds1, sf, lpDDSrcSurface, src, dwFlags, lpDDBltFx);
+		if (This->dd_parent->gdi && (This->dd_parent->gdi == src || (This->dd_parent->gdi == sf && src))) {	// TODO: What if dwFlags is no SRCCOPY
+			INFO("  GDI surface match: %08X\n", This->dd_parent->gdi);
+			if (This->dd_parent->palette) {	// Set palette for offScreen surface in case it doesn't have one
+				LPDIRECTDRAWSURFACE tgt = This->dd_parent->gdi == src ? sf : src;
+				if (tgt != This->dd_parent->fake[0] && tgt != This->dd_parent->fake[1]) { tgt->lpVtbl->SetPalette(tgt, This->dd_parent->palette); }
+			}
+			hResult = dx::Stretch(This, sf, lpDestRect, src, lpSrcRect); 	// WTF! Writing to GDI surface only works in a virtual machine, blame Micro$oft!
+		} else {
+			hResult = sf->lpVtbl->Blt(sf, lpDestRect, src, lpSrcRect, dwFlags, lpDDBltFx);
+		}
 		if (SUCCEEDED(hResult) && This->dds1 == This->dd_parent->fake[0]) { // Front
 			dx::Flush(This, sf, lpDestRect);
 		}
@@ -177,18 +186,26 @@ namespace dds
 	HRESULT __stdcall BltFast( WRAP* This, DWORD dwX, DWORD dwY, LPDIRECTDRAWSURFACE lpDDSrcSurface, LPRECT lpSrcRect, DWORD dwTrans )
 	{
 		PROLOGUE;
+		HRESULT hResult;
 		lpDDSrcSurface = GetInnerInterface(lpDDSrcSurface);
 		LPDIRECTDRAWSURFACE src = dx::MatchFlip(This, lpDDSrcSurface);
 		LPDIRECTDRAWSURFACE sf = dx::MatchFlip(This, This->dds1);
-		HRESULT hResult = sf->lpVtbl->BltFast(sf, dwX, dwY, src, lpSrcRect, dwTrans);
+
 		INFO("BltFast %08X (%08X) <- %08X (%08X) : %08X\n", This->dds1, sf, lpDDSrcSurface, src, dwTrans);
-		if (SUCCEEDED(hResult) && This->dds1 == This->dd_parent->fake[0]) { // Front
-			if (lpSrcRect) {
-				RECT r = {(int)dwX, (int)dwY, lpSrcRect->right - lpSrcRect->left + (int)dwX, lpSrcRect->bottom - lpSrcRect->top + (int)dwY};
-				dx::Flush(This, sf, &r);
-			} else {
-				dx::Flush(This, sf);
+		if (This->dd_parent->gdi && (This->dd_parent->gdi == src || (This->dd_parent->gdi == sf && src))) {	// TODO: What if dwTrans is no SRCCOPY
+			INFO("  GDI surface match: %08X\n", This->dd_parent->gdi);
+			if (This->dd_parent->palette) {	// Set palette for offScreen surface in case it doesn't have one
+				LPDIRECTDRAWSURFACE tgt = This->dd_parent->gdi == src ? sf : src;
+				if (tgt != This->dd_parent->fake[0] && tgt != This->dd_parent->fake[1]) { tgt->lpVtbl->SetPalette(tgt, This->dd_parent->palette); }
 			}
+			RECT r = {(int)dwX, (int)dwY, lpSrcRect->right - lpSrcRect->left + (int)dwX, lpSrcRect->bottom - lpSrcRect->top + (int)dwY};
+			hResult = dx::Stretch(This, sf, &r, src, lpSrcRect); 	// WTF! Writing to GDI surface only works in a virtual machine, blame Micro$oft!
+		} else {
+			hResult = sf->lpVtbl->BltFast(sf, dwX, dwY, src, lpSrcRect, dwTrans);
+		}
+		if (SUCCEEDED(hResult) && This->dds1 == This->dd_parent->fake[0]) { // Front
+			RECT r = {(int)dwX, (int)dwY, lpSrcRect->right - lpSrcRect->left + (int)dwX, lpSrcRect->bottom - lpSrcRect->top + (int)dwY};
+			dx::Flush(This, sf, &r);
 		}
 		EPILOGUE( hResult );
 	}
