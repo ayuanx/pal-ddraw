@@ -12,44 +12,23 @@ CRITICAL_SECTION log_lock;
 void __cdecl Log( const char* fmt, ... )
 {
 	static char buf[1024];
-	static size_t pos = 0; 
-	OVERLAPPED ol;
 	int len;
 	DWORD bytes_written;
 
-	if( file == INVALID_HANDLE_VALUE )
-	{
+	if( file == INVALID_HANDLE_VALUE ) {
 		InitializeCriticalSection(&log_lock);
 		EnterCriticalSection(&log_lock); 
-		if( file == INVALID_HANDLE_VALUE )
-		{
-			file = CreateFile("ddraw.log", GENERIC_WRITE, 
-					FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0
-					);
-			LeaveCriticalSection(&log_lock);
-			if( file == INVALID_HANDLE_VALUE ){ return; }
-		}
+		file = CreateFile("ddraw.log", GENERIC_WRITE, FILE_SHARE_READ, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, 0);
+		LeaveCriticalSection(&log_lock);
+		if( file == INVALID_HANDLE_VALUE ) { return; }
 	}
 
 	EnterCriticalSection(&log_lock);
-
 	va_list args;
 	va_start(args,fmt);
 	len = wvsprintf( buf, fmt, args );
 	va_end(args);
-
-	ol.Offset = pos;
-	ol.OffsetHigh = 0; 
-	ol.hEvent = NULL;
-
-	if( WriteFile(file, buf, len, &bytes_written,  &ol) )
-	{
-		pos += bytes_written;
-	} 
-	else
-	{
-		// GetLastError();
-	}
+	WriteFile(file, buf, len, &bytes_written,  NULL);
 	LeaveCriticalSection(&log_lock);
 }
 

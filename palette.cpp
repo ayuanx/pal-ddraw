@@ -60,7 +60,7 @@ namespace palette
 	{
 		PROLOGUE;
 		HRESULT hResult = This->pal->lpVtbl->SetEntries( This->pal, dwFlags, dwStartingEntry, dwCount, lpEntries );
-		INFO("SetEntries offset %d cnt %d\n", dwStartingEntry, dwCount);
+		INFO("SetEntries %08X offset %d cnt %d\n", This->pal, dwStartingEntry, dwCount);
 		if (SUCCEEDED(hResult) && (This->pal == This->dd_parent->palette)) {
 			if (This->dd_parent->enabled > 256) { // Palette is fully initialized.
 				dx::Flush(This, This->dd_parent->fake[This->dd_parent->flip], NULL, 1);
