@@ -66,7 +66,15 @@ namespace dds
 		INFO("QueryInterface DDS %08X -> %08X (IID %08X)\n", This->dds1, *ppvObject, riid);
 		if (SUCCEEDED(hResult)) {
 			// Update our records so that we don't lose track
-			if (This->dds1 == This->dd_parent->fake[0]) This->dd_parent->fake[0] = (LPDIRECTDRAWSURFACE)*ppvObject;
+			if (This->dds1 == This->dd_parent->fake[0]) {
+				This->dd_parent->fake[0] = (LPDIRECTDRAWSURFACE)*ppvObject;
+				LPDIRECTDRAWSURFACE fakeBack = This->dd_parent->fake[1];
+				if (fakeBack) {
+					fakeBack->lpVtbl->QueryInterface(fakeBack, riid, (void**)&This->dd_parent->fake[1]);
+					fakeBack->lpVtbl->Release(fakeBack);
+				}
+				INFO("  update fakeFont: %08X, fakeBack: %08X", This->dd_parent->fake[0], This->dd_parent->fake[1]);
+			}
 			else if (This->dds1 == This->dd_parent->fake[1]) This->dd_parent->fake[1] = (LPDIRECTDRAWSURFACE)*ppvObject;
 			Wrap(This->dd_parent, iid_to_vtbl(riid), ppvObject);
 		}

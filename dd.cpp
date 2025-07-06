@@ -262,6 +262,7 @@ namespace dd
 		PROLOGUE;
 		HRESULT hResult = This->dd1->lpVtbl->GetGDISurface( This->dd1, lplpGDIDDSurface );
 		INFO("GetGDISurface -> %08X\n", *lplpGDIDDSurface);
+		// On modern Windows, GDI surface is exactly the primary DDRAW surface. WTF?!
 		if (This->dd_parent->enabled) {
 			This->dd_parent->gdi = *lplpGDIDDSurface;
 			INFO("  GDI surface is set\n");
