@@ -103,7 +103,7 @@ namespace dd
 	{
 		PROLOGUE;
 		HRESULT hResult;
-		INFO("CreateSurface DD %08X dwCaps %08X\n", This->dd1, lpDDSurfaceDesc->ddsCaps.dwCaps);
+		INFO("CreateSurface DD %08X dwFlags %08X dwCaps %08X\n", This->dd1, lpDDSurfaceDesc->dwFlags, lpDDSurfaceDesc->ddsCaps.dwCaps);
 		if (This->dd_parent->enabled) {
 			if (lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_PRIMARYSURFACE) {
 				bool dual = lpDDSurfaceDesc->ddsCaps.dwCaps & DDSCAPS_COMPLEX;
@@ -172,7 +172,7 @@ namespace dd
 				lpDDSurfaceDesc->ddpfPixelFormat.dwRGBAlphaBitMask = 0;
 				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter);
 				if (SUCCEEDED(hResult) && This->dd_parent->palette) (*lplpDDSurface)->lpVtbl->SetPalette(*lplpDDSurface, This->dd_parent->palette);
-				INFO("  offScreen %08X\n", *lplpDDSurface);
+				INFO("  offScreen %08X (W:%d H:%d)\n", *lplpDDSurface, lpDDSurfaceDesc->dwWidth, lpDDSurfaceDesc->dwHeight);
 			}
 		} else {
 			hResult = This->dd1->lpVtbl->CreateSurface( This->dd1, lpDDSurfaceDesc, lplpDDSurface, pUnkOuter );
