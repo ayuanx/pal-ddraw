@@ -16,6 +16,7 @@ namespace dx
 		return in;
 	}
 
+	/*
 	HRESULT Stretch(WRAP* wp, LPDIRECTDRAWSURFACE dst, LPRECT dstRect, LPDIRECTDRAWSURFACE src, LPRECT srcRect) {
 		DWORD srcX = srcRect ? srcRect->left : 0;
 		DWORD srcY = srcRect ? srcRect->top : 0;
@@ -35,6 +36,7 @@ namespace dx
 		dst->lpVtbl->ReleaseDC(dst, dstDC);
 		return hResult;
 	}
+	*/
 
 	HRESULT Flush(WRAP* wp, LPDIRECTDRAWSURFACE fk, LPRECT rect, DWORD pal, DWORD dwFlags) {
 		HRESULT hResult = DD_OK;
