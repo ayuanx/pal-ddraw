@@ -58,6 +58,9 @@ NOTE: It actually can also work on Win95/98 if you follow the extra procedure be
 
 # Revisions:
 
+v.2026.10.02
+- Fix flip mode for DirectDraw7.
+
 v.2025.06.14
 - Fix a bug in clipper/palette when window mode emulation is enabled.
 - Improve compatibility for GDI surface in virtual machines.

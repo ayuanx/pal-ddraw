@@ -118,9 +118,9 @@ namespace dd
 				hResult = This->dd1->lpVtbl->CreateSurface(This->dd1, lpDDSurfaceDesc, &This->dd_parent->real[0], pUnkOuter);
 				if (SUCCEEDED(hResult)) {
 					if (This->dd_parent->caps) {
-						DDSCAPS ddsCaps = {0};
+						DDSCAPS2 ddsCaps = {0};	// Use DDSCAPS2 for compatibility with DirectDraw7.
 						ddsCaps.dwCaps = DDSCAPS_BACKBUFFER;
-						hResult = This->dd_parent->real[0]->lpVtbl->GetAttachedSurface(This->dd_parent->real[0], &ddsCaps, &This->dd_parent->real[1]);
+						hResult = This->dd_parent->real[0]->lpVtbl->GetAttachedSurface(This->dd_parent->real[0], (DDSCAPS*)&ddsCaps, &This->dd_parent->real[1]);
 					} else {
 						This->dd_parent->real[1] = NULL;
 					}
